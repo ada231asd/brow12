@@ -1,0 +1,12 @@
+.news-grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+.news-grid .news-card {
+  width: 640px;
+  height: 239px;
+  background-color: #292929;
+  border-radius: 8px;
+  color: white;
+}/*# sourceMappingURL=style.css.map */

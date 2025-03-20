@@ -1,0 +1,111 @@
+<?php
+header("Content-Type: application/json");
+require __DIR__ . '/../backend/ajax/db.php';
+session_start();
+
+$response = ['status' => 'error', 'message' => ''];
+
+try {
+    // Проверка авторизации
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception('Требуется авторизация');
+    }
+    
+    $userId = $_SESSION['user_id'];
+    $action = $_GET['action'] ?? '';
+    $productId = isset($_GET['product_id']) ? intval($_GET['product_id']) : 0;
+
+    $pdo = getPDO();
+    
+    // Проверка существования пользователя
+    $stmt = $pdo->prepare("SELECT user_id FROM Users WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    if (!$stmt->fetch()) {
+        throw new Exception("Пользователь не существует");
+    }
+
+    switch ($action) {
+        case 'add':
+            // Лимит 3 товара
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM Comparison_Items 
+                                  WHERE comparison_id = 
+                                    (SELECT comparison_id FROM Comparison_List WHERE user_id = ?)");
+            $stmt->execute([$userId]);
+            if ($stmt->fetchColumn() >= 3) {
+                throw new Exception("Максимум 3 товара");
+            }
+
+            // Проверка категории
+            $stmt = $pdo->prepare("SELECT category_id FROM Products WHERE product_id = ?");
+            $stmt->execute([$productId]);
+            $newCategory = $stmt->fetchColumn();
+            
+            $stmt = $pdo->prepare("SELECT p.category_id 
+                                  FROM Comparison_Items ci
+                                  JOIN Products p ON ci.product_id = p.product_id
+                                  WHERE ci.comparison_id = 
+                                    (SELECT comparison_id FROM Comparison_List WHERE user_id = ?)");
+            $stmt->execute([$userId]);
+            $existingCategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            foreach ($existingCategories as $cat) {
+                if ($cat != $newCategory) {
+                    throw new Exception("Нельзя сравнивать разные категории");
+                }
+            }
+
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare("INSERT IGNORE INTO Comparison_List (user_id) VALUES (?)");
+            $stmt->execute([$userId]);
+            
+            $stmt = $pdo->prepare("INSERT INTO Comparison_Items (comparison_id, product_id)
+                                  VALUES (
+                                    (SELECT comparison_id FROM Comparison_List WHERE user_id = ?), 
+                                    ?
+                                  )");
+            $stmt->execute([$userId, $productId]);
+            $pdo->commit();
+            $response['status'] = 'success';
+            break;
+
+        case 'remove':
+            $stmt = $pdo->prepare("DELETE FROM Comparison_Items 
+                                  WHERE product_id = ? 
+                                    AND comparison_id = 
+                                      (SELECT comparison_id FROM Comparison_List WHERE user_id = ?)");
+            $stmt->execute([$productId, $userId]);
+            $response['status'] = 'success';
+            break;
+
+        case 'get':
+            $stmt = $pdo->prepare("SELECT p.* 
+                                  FROM Comparison_Items ci
+                                  JOIN Products p ON ci.product_id = p.product_id
+                                  WHERE ci.comparison_id = 
+                                    (SELECT comparison_id FROM Comparison_List WHERE user_id = ?)");
+            $stmt->execute([$userId]);
+            $response = [
+                'status' => 'success',
+                'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)
+            ];
+            break;
+
+        case 'clear':
+            $stmt = $pdo->prepare("DELETE FROM Comparison_Items 
+                                  WHERE comparison_id = 
+                                    (SELECT comparison_id FROM Comparison_List WHERE user_id = ?)");
+            $stmt->execute([$userId]);
+            $response['status'] = 'success';
+            break;
+
+        default:
+            throw new Exception("Неизвестное действие");
+    }
+} catch (PDOException $e) {
+    $pdo->rollBack();
+    $response['message'] = "Ошибка БД: " . $e->getMessage();
+} catch (Exception $e) {
+    $response['message'] = $e->getMessage();
+}
+
+echo json_encode($response);
