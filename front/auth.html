@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация/Регистрация</title>
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-toggle {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #eee;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background: #007bff;
+            color: white;
+        }
+        .auth-form {
+            display: none;
+        }
+        .auth-form.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="form-toggle">
+            <button class="toggle-btn active" data-form="login">Вход</button>
+            <button class="toggle-btn" data-form="register">Регистрация</button>
+        </div>
+
+        <form id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Пароль" required>
+            </div>
+            <button type="submit">Войти</button>
+        </form>
+
+        <form id="registerForm" class="auth-form">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Имя" required>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Пароль" required>
+            </div>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+        <div class="error" id="errorMessage"></div>
+    </div>
+
+    <script>
+        // Переключение форм
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.toggle-btn, .auth-form').forEach(el => {
+                    el.classList.remove('active');
+                });
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.form + 'Form').classList.add('active');
+            });
+        });
+
+        // Обработка форм
+        async function handleFormSubmit(form, action) {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const errorElement = document.getElementById('errorMessage');
+
+            try {
+                const response = await fetch(`../api/auth.php?action=${action}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    window.location.href = 'catalog copy.php';
+                } else {
+                    errorElement.textContent = result.message;
+                }
+            } catch (error) {
+                errorElement.textContent = 'Ошибка соединения';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', e => {
+            e.preventDefault();
+            handleFormSubmit(e.target, 'login');
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', e => {
+            e.preventDefault();
+            handleFormSubmit(e.target, 'register');
+        });
+    </script>
+</body>
+</html>
