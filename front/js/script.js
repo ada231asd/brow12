@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(error => console.error('Ошибка:', error));
-});
+}); 
 
 function renderProducts(products, containerId) {
     const container = document.getElementById(containerId);
@@ -29,11 +29,13 @@ function renderProducts(products, containerId) {
 
     container.innerHTML = products.map(product => `
         <div class="product-card">
-            ${product.is_bestseller || product.is_new ? `
-                <div class="status ${product.is_bestseller ? 'hit' : 'new'}">
-                    ${product.is_bestseller ? 'Хит продаж' : 'Новинка'}
-                </div>
-            ` : ''}
+        ${product.is_bestseller ? `
+            <div class="status hit">Хит продаж</div>
+        ` : product.is_new ? `
+            <div class="status new">Новинка</div>
+        ` : `
+            <div class="status no-status"></div>
+        `}
             
             <img src="${product.image_url}" 
                  class="product-image" 
@@ -56,16 +58,18 @@ function renderProducts(products, containerId) {
                     </div>
                 </div>
             <div class="ppt">
-                <div class="price-block">
-                    ${product.discount > 0 ? `
-                            <div class="old-price">${Math.round(product.price || 0).toLocaleString()} ₽</div>
-                            <div class="current-price">${Math.round(product.final_price || 0).toLocaleString()} ₽</div>
-                            <div class="discount-badge">
-                                <p>-${Math.round(product.discount)}% </p>
-                                <span>- ${Math.round((product.price - product.final_price) || 0).toLocaleString()} ₽</span>
-                            </div>
-                    ` : ''}
-                </div>
+               <div class="price-block ${product.discount > 0 ? 'with-discount' : 'no-discount'}">
+    ${product.discount > 0 ? `
+        <div class="old-price">${Math.round(product.price || 0).toLocaleString()} ₽</div>
+        <div class="current-price">${Math.round(product.final_price || 0).toLocaleString()} ₽</div>
+        <div class="discount-badge">
+            <p>-${Math.round(product.discount)}% </p>
+            <span>- ${Math.round((product.price - product.final_price) || 0).toLocaleString()} ₽</span>
+        </div>
+    ` : `
+        <div class="current-price">${Math.round(product.price || 0).toLocaleString()} ₽</div>
+    `}
+</div>
                 <div class="but_t">
                         <div class="button">
                             <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">

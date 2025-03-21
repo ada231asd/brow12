@@ -14,7 +14,7 @@
 
         // Получение данных пользователя
         $stmt = $pdo->prepare("SELECT * FROM Users WHERE user_id = ?");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId]);  
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$userData) {
