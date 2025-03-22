@@ -23,8 +23,18 @@
     <div class="categories-filter">
             <h3>Категории</h3>
             <div class="categories-list" id="categoriesContainer"></div>
-         </div>
         </div>
+        <div class="price-filter">
+    <h3>Фильтр по цене</h3>
+    <div class="price-slider-container">
+        <div id="priceSlider"></div>
+        <div class="price-labels">
+            <span id="minPriceLabel">0 ₽</span>
+            <span id="maxPriceLabel">0 ₽</span>
+        </div>
+    </div>
+</div>
+    </div>
      <div class="top_f">
 
         <div class="fl_top">
@@ -47,6 +57,7 @@
 
 
 <!-- <?php require '../Foter/foter.html';?> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js">
 <script src="js/script.js"></script>
 </body>
 

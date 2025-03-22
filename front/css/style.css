@@ -498,4 +498,45 @@ h3 {
 .fl_top .filter-group .rs {
   color: #F15152;
   text-decoration: underline;
+}
+
+/* Добавляем стили для ползунка */
+.price-filter {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.price-slider-container {
+  margin: 15px 10px;
+}
+
+.noUi-target {
+  background: #ddd;
+  border: none;
+  box-shadow: none;
+}
+
+.noUi-connect {
+  background: #007bff;
+}
+
+.noUi-handle {
+  width: 18px;
+  height: 18px;
+  top: -7px;
+  right: -9px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #007bff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.price-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
 }/*# sourceMappingURL=style.css.map */

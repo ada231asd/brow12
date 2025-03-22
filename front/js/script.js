@@ -1,14 +1,153 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('../api/products.php')
-        .then(response => response.json())
-        .then(data => {
+    let currentFilters = {
+        rating: 0,
+        category: null,
+        filter: null,
+        sort: null
+    };
+
+    let allCategories = new Map(); // Храним все категории
+
+    // Инициализация фильтров
+    async function initFilters() {
+        // Первоначальная загрузка всех категорий
+        await loadAllCategories();
+        
+        // Загрузка продуктов с текущими фильтрами
+        await loadProducts();
+        
+        setupRatingFilter();
+        setupCategoryFilter();
+        setupSpecialFilters();
+        setupSorting();
+        setupResetButton();
+    }
+
+    async function loadAllCategories() {
+        try {
+            const response = await fetch(`../api/products.php`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const categoriesMap = new Map();
+                data.data.forEach(product => {
+                    if (product.category_id && product.category_name) {
+                        categoriesMap.set(product.category_id, product.category_name);
+                    }
+                });
+                allCategories = categoriesMap;
+                renderCategories();
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки категорий:', error);
+        }
+    }
+    // Загрузка продуктов с текущими фильтрами
+    async function loadProducts() {
+        try {
+            const params = new URLSearchParams();
+            if (currentFilters.rating > 0) params.append('rating', currentFilters.rating);
+            if (currentFilters.category) params.append('category', currentFilters.category);
+            if (currentFilters.filter) params.append('filter', currentFilters.filter);
+            if (currentFilters.sort) params.append('sort', currentFilters.sort);
+
+            const response = await fetch(`../api/products.php?${params}`);
+            const data = await response.json();
+            
             if (data.status === 'success') {
                 renderProducts(data.data, 'products-container');
             }
-        })
-        .catch(error => console.error('Ошибка:', error));
-}); 
+        } catch (error) {
+            console.error('Ошибка загрузки продуктов:', error);
+        }
+    }
 
+    // Генерация категорий из полученных продуктов
+    function renderCategories() {
+        const container = document.getElementById('categoriesContainer');
+        if (!container || !allCategories) return;
+
+        container.innerHTML = Array.from(allCategories).map(([id, name]) => `
+            <button class="category-btn ${currentFilters.category == id ? 'active' : ''}" 
+                    data-category="${id}">
+                ${name}
+            </button>
+        `).join('');
+    }
+
+    // Обработка рейтинга
+    function setupRatingFilter() {
+        document.querySelectorAll('.rating-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentFilters.rating = parseFloat(this.dataset.rating);
+                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                loadProducts(); // Только обновляем продукты
+            });
+        });
+    }
+
+    // Обработка категорий
+    function setupCategoryFilter() {
+        const container = document.getElementById('categoriesContainer');
+        if (!container) return;
+
+        container.addEventListener('click', e => {
+            const target = e.target.closest('.category-btn');
+            if (!target) return;
+
+            const category = target.dataset.category;
+            currentFilters.category = currentFilters.category === category ? null : category;
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            if (currentFilters.category) target.classList.add('active');
+            
+            loadProducts()
+                .catch(error => console.error('Ошибка фильтрации:', error));
+        });
+    }
+
+    // Обработка хитов/новинок
+    function setupSpecialFilters() {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentFilters.filter = currentFilters.filter === this.dataset.filter ? null : this.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                if (currentFilters.filter) this.classList.add('active');
+                loadProducts(); // Только обновляем продукты
+            });
+        });
+    }
+    // Сортировка
+    function setupSorting() {
+        const sortSelect = document.getElementById('sortSelect');
+        if (!sortSelect) return;
+
+        sortSelect.addEventListener('change', function() {
+            currentFilters.sort = this.value || null;
+            loadProducts()
+                .then(products => renderCategories(products))
+                .catch(error => console.error('Ошибка сортировки:', error));
+        });
+    }
+
+    // Сброс фильтров
+    function setupResetButton() {
+        const resetBtn = document.getElementById('resetFilters');
+        if (!resetBtn) return;
+
+        resetBtn.addEventListener('click', () => {
+            currentFilters = { rating: 0, category: null, filter: null, sort: null };
+            document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            document.getElementById('sortSelect').value = '';
+            loadProducts()
+                .then(products => renderCategories(products))
+                .catch(error => console.error('Ошибка сброса:', error));
+        });
+    }
+
+    // Первоначальная загрузка
+    initFilters();
+});
 function renderProducts(products, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
