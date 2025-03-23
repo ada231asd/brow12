@@ -468,6 +468,7 @@ h3{
 }
 .filter_cont{
     display: flex;
+    flex-direction: column;
     width: 310px;
 }
 
@@ -504,43 +505,46 @@ h3{
         }
     }
 }
-/* Добавляем стили для ползунка */
-.price-filter {
-    margin: 20px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
+
+.price-controls {
+    margin: 15px 0;
 }
 
-.price-slider-container {
-    margin: 15px 10px;
+.price-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.price-inputs input {
+    width: 120px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#applyPriceBtn {
+    padding: 8px 20px;
+    background-color: #6A48A6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#applyPriceBtn:hover {
+    background-color: #5D3F8E;
 }
 
 .noUi-target {
-    background: #ddd;
-    border: none;
-    box-shadow: none;
-}
-
-.noUi-connect {
-    background: #007bff;
+    margin: 15px 0;
 }
 
 .noUi-handle {
-    width: 18px;
-    height: 18px;
-    top: -7px;
-    right: -9px;
-    border-radius: 50%;
-    background: #fff;
-    border: 2px solid #007bff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.price-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    font-size: 14px;
-    color: #666;
+    width: 20px !important;
+    height: 20px !important;
+    right: -10px !important;
+    background: #6A48A6 !important;
 }
