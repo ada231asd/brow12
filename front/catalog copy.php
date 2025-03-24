@@ -8,50 +8,35 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<!-- <?php require '../Header/header.html'; ?> -->
+<?php require '../Header/header.html'; ?>
 <div class="catalog">
     <div class="filter_cont">
 
     <div class="filter-group">
-        <div class="rating-filter">
-            <span>Рейтинг:</span>
-            <button class="rating-btn" data-rating="4">★★★★ и выше</button>
-            <button class="rating-btn" data-rating="3">★★★ и выше</button>
-            <button class="rating-btn" data-rating="0">Любой</button>
-        </div>
-    </div>
     <div class="categories-filter">
-            <h3>Категории</h3>
+            <h3>Категории:</h3>
             <div class="categories-list" id="categoriesContainer"></div>
         </div>
-        <!-- Добавьте кнопку в HTML -->
-<div class="price-filter">
-    <h3>Фильтр по цене</h3>
-    <div class="price-inputs">
-        <input type="number" id="minPriceInput" placeholder="Мин" min="0" max="999999">
-        <input type="number" id="maxPriceInput" placeholder="Макс" min="0" max="999999">
-        <button id="applyPriceBtn">Применить</button>
-    </div>
-    <div class="price-slider-container">
-        <div id="priceSlider"></div>
-        <div class="price-labels">
-            <span id="minPriceLabel">0 ₽</span>
-            <span id="maxPriceLabel">999 999 ₽</span>
+        <div class="rating-filter">
+            <h3>Рейтинг:</h3>
+            <div class="rating-btn" data-rating="4">★★★★ и выше</div>
+            <div class="rating-btn" data-rating="3">★★★ и выше</div>
+            <div class="rating-btn" data-rating="0">Любой</div>
         </div>
     </div>
 </div>
-    </div>
+    
      <div class="top_f">
-     <div class="search-container">
+     
+        <div class="fl_top">
+        <div class="search-container">
     <input 
         type="text" 
         id="searchInput" 
         placeholder="Поиск товаров..." 
         class="search-input"
     >
-    <div id="searchStatus" class="search-status"></div>
 </div>
-        <div class="fl_top">
         <div class="filter-group">
             <button class="filter-btn" data-filter="hit">Хиты</button>
             <button class="filter-btn" data-filter="new">Новинки</button>
@@ -64,6 +49,18 @@
     </select>
     </div>
  <div class="catalog-container" id="products-container"></div>
+ <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loader"></div>
+</div>
+ <div class="no-results" id="noResults" style="display: none;">
+    <div class="no-results-content">
+        <div class="no-results-image">
+           
+        </div>
+        <h3 class="no-results-title">Ничего не найдено</h3>
+        <p class="no-results-text">Попробуйте изменить параметры поиска</p>
+    </div>
+</div>
      </div>   
 </div>
 

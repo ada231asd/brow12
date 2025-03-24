@@ -4,24 +4,17 @@ document.addEventListener('DOMContentLoaded', () => {
         category: null,
         filter: null,
         sort: null,
-        minPrice: null,
-        maxPrice: null,
         searchQuery: null
     };
 
     let searchTimeout = null;
     let abortController = null;
-    let minPriceInput = null;
-    let maxPriceInput = null;
-    let isManualInput = false;
     let allCategories = new Map();
-    let priceSlider = null;
 
     async function initFilters() {
         await loadAllCategories();
         await loadProducts();
         setupEventListeners();
-        initPriceSlider();
     }
 
     function setupEventListeners() {
@@ -30,23 +23,23 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSpecialFilters();
         setupSorting();
         setupResetButton();
-        setupPriceValidation();
         setupSearch();
     }
+
     function setupSearch() {
         const searchInput = document.getElementById('searchInput');
         const searchStatus = document.getElementById('searchStatus');
-    
+        const noResultsBlock = document.getElementById('noResults');
+
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
             
-            if (abortController) {
-                abortController.abort();
-            }
+            if (abortController) abortController.abort();
             abortController = new AbortController();
-    
+
             searchStatus.textContent = '';
-            
+            noResultsBlock.style.display = 'none';
+
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
                 try {
@@ -54,7 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     await loadProducts();
                     
                     if (query.length > 0) {
-                        searchStatus.textContent = `Найдено: ${document.getElementById('products-container').children.length}`;
+                        const resultsCount = document.getElementById('products-container').children.length;
+                        searchStatus.textContent = resultsCount > 0 
+                            ? `Найдено: ${resultsCount}` 
+                            : 'Ничего не найдено';
                     }
                 } catch (error) {
                     if (error.name !== 'AbortError') {
@@ -65,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300);
         });
     }
+
     async function loadAllCategories() {
         try {
             const response = await fetch(`../api/products.php`);
@@ -84,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Ошибка загрузки категорий:', error);
         }
     }
+
     async function loadProducts() {
         try {
             let apiUrl;
@@ -91,123 +89,30 @@ document.addEventListener('DOMContentLoaded', () => {
     
             if (currentFilters.searchQuery) {
                 apiUrl = '../api/search.php';
-                params = new URLSearchParams({
-                    query: currentFilters.searchQuery
-                });
+                params = new URLSearchParams({ query: currentFilters.searchQuery });
             } else {
                 apiUrl = '../api/products.php';
                 params = new URLSearchParams();
                 
-                // Добавляем параметры только если они есть
                 if (currentFilters.rating > 0) params.append('rating', currentFilters.rating);
                 if (currentFilters.category) params.append('category', currentFilters.category);
                 if (currentFilters.filter) params.append('filter', currentFilters.filter);
                 if (currentFilters.sort) params.append('sort', currentFilters.sort);
-                if (currentFilters.minPrice) params.append('min_price', currentFilters.minPrice);
-                if (currentFilters.maxPrice) params.append('max_price', currentFilters.maxPrice);
             }
     
-            console.log('Fetching:', apiUrl, params.toString()); // Отладка
-            
             const response = await fetch(`${apiUrl}?${params}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
             const data = await response.json();
-            console.log('Received data:', data); // Отладка
             
             if (data.status === 'success') {
                 renderProducts(data.data, 'products-container');
-                if (!currentFilters.searchQuery) {
-                    updatePriceSlider(data.data);
-                }
             }
         } catch (error) {
             console.error('Ошибка загрузки продуктов:', error);
             document.getElementById('products-container').innerHTML = 
                 '<div class="error">Ошибка загрузки товаров</div>';
-        }
-    }
-    function initPriceSlider() {
-        const slider = document.getElementById('priceSlider');
-        minPriceInput = document.getElementById('minPriceInput');
-        maxPriceInput = document.getElementById('maxPriceInput');
-        
-        if (!slider) return;
-    
-        priceSlider = noUiSlider.create(slider, {
-            start: [0, 0],
-            connect: true,
-            range: { min: 0, max: 0 },
-            step: 1,
-            behaviour: 'drag',
-            format: {
-                to: value => Math.round(value),
-                from: value => Number(value)
-            }
-        });
-    
-        minPriceInput.addEventListener('change', handleManualPriceChange);
-        maxPriceInput.addEventListener('change', handleManualPriceChange);
-    
-        priceSlider.on('update', (values) => {
-            const [min, max] = values.map(Number);
-            
-            if (!isManualInput) {
-                minPriceInput.value = min;
-                maxPriceInput.value = max;
-            }
-            
-            document.getElementById('minPriceLabel').textContent = `${min} ₽`;
-            document.getElementById('maxPriceLabel').textContent = `${max} ₽`;
-        });
-    
-        priceSlider.on('end', (values) => {
-            currentFilters.minPrice = Math.round(values[0]);
-            currentFilters.maxPrice = Math.round(values[1]);
-            loadProducts();
-        });
-    }
-
-    function handleManualPriceChange(e) {
-        isManualInput = true;
-        
-        const target = e.target;
-        let value = parseInt(target.value) || 0;
-        const sliderRange = priceSlider.options.range;
-
-        // Ограничение ввода значений
-        if (target.id === 'minPriceInput') {
-            value = Math.max(sliderRange.min, Math.min(value, sliderRange.max));
-            priceSlider.set([value, null]);
-        } else {
-            value = Math.max(sliderRange.min, Math.min(value, sliderRange.max));
-            priceSlider.set([null, value]);
-        }
-        
-        isManualInput = false;
-        currentFilters.minPrice = parseInt(minPriceInput.value) || null;
-        currentFilters.maxPrice = parseInt(maxPriceInput.value) || null;
-        loadProducts();
-    }
-
-    function updatePriceSlider(products) {
-        if (!priceSlider || !products.length) return;
-        
-        const prices = products.map(p => p.final_price);
-        const currentMin = Math.min(...prices);
-        const currentMax = Math.max(...prices);
-        const [prevMin, prevMax] = priceSlider.get();
-        
-        priceSlider.updateOptions({
-            range: { min: currentMin, max: currentMax },
-            start: [
-                currentFilters.minPrice || currentMin,
-                currentFilters.maxPrice || currentMax
-            ]
-        });
-        
-        if (!currentFilters.minPrice && !currentFilters.maxPrice) {
-            priceSlider.set([currentMin, currentMax]);
+            document.getElementById('noResults').style.display = 'none';
         }
     }
 
@@ -216,19 +121,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container || !allCategories) return;
 
         container.innerHTML = Array.from(allCategories).map(([id, name]) => `
-            <button class="category-btn ${currentFilters.category == id ? 'active' : ''}" 
-                    data-category="${id}">
+            <div class="category-btn ${currentFilters.category == id ? 'active' : ''}" 
+                 data-category="${id}">
                 ${name}
-            </button>
+            </div>
         `).join('');
     }
 
     function setupRatingFilter() {
         document.querySelectorAll('.rating-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                currentFilters.rating = parseFloat(this.dataset.rating);
-                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
+                const newRating = parseFloat(this.dataset.rating);
+                
+                if(currentFilters.rating === newRating) {
+                    this.classList.remove('active');
+                    currentFilters.rating = 0;
+                } else {
+                    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilters.rating = newRating;
+                }
                 loadProducts();
             });
         });
@@ -236,41 +148,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupCategoryFilter() {
         const container = document.getElementById('categoriesContainer');
-        if (!container) return;
-
         container.addEventListener('click', e => {
             const target = e.target.closest('.category-btn');
             if (!target) return;
 
-            const category = target.dataset.category;
-            currentFilters.category = currentFilters.category === category ? null : category;
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            if (currentFilters.category) target.classList.add('active');
+            const categoryId = target.dataset.category;
             
-            currentFilters.minPrice = null;
-            currentFilters.maxPrice = null;
+            if(currentFilters.category === categoryId) {
+                target.classList.remove('active');
+                currentFilters.category = null;
+            } else {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                target.classList.add('active');
+                currentFilters.category = categoryId;
+            }
             loadProducts();
         });
     }
-    function setupPriceValidation() {
-        document.getElementById('minPriceInput').addEventListener('blur', function() {
-            if (this.value < priceSlider.options.range.min) {
-                this.value = priceSlider.options.range.min;
-            }
-        });
-        
-        document.getElementById('maxPriceInput').addEventListener('blur', function() {
-            if (this.value > priceSlider.options.range.max) {
-                this.value = priceSlider.options.range.max;
-            }
-        });
-    }
+
     function setupSpecialFilters() {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                currentFilters.filter = currentFilters.filter === this.dataset.filter ? null : this.dataset.filter;
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                if (currentFilters.filter) this.classList.add('active');
+                if (currentFilters.filter !== this.dataset.filter) {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilters.filter = this.dataset.filter;
+                } else {
+                    this.classList.remove('active');
+                    currentFilters.filter = null;
+                }
                 loadProducts();
             });
         });
@@ -288,33 +194,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupResetButton() {
         const resetBtn = document.getElementById('resetFilters');
-        if (!resetBtn) return;
-    
         resetBtn.addEventListener('click', () => {
             currentFilters = { 
                 rating: 0, 
                 category: null, 
                 filter: null, 
                 sort: null,
-                minPrice: null,
-                maxPrice: null 
+                searchQuery: null
             };
-            
-            // Сброс полей ввода
-            minPriceInput.value = '';
-            maxPriceInput.value = '';
             
             document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
             document.getElementById('sortSelect').value = '';
-            if (priceSlider) priceSlider.reset();
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchStatus').textContent = '';
+            document.getElementById('noResults').style.display = 'none';
             loadProducts();
         });
     }
 
     function renderProducts(products, containerId) {
         const container = document.getElementById(containerId);
-        if (!container) return;
+        const noResultsBlock = document.getElementById('noResults');
+        
+        if (!container || !noResultsBlock) return;
 
+        // Управление отображением результатов
+        if (products.length === 0 && currentFilters.searchQuery) {
+            container.style.display = 'none';
+            noResultsBlock.style.display = 'flex';
+        } else {
+            container.style.display = 'grid';
+            noResultsBlock.style.display = 'none';
+        }
+
+        // Рендер карточек товаров
         const renderStars = (rating) => {
             const numericRating = parseFloat(rating) || 0;
             const clampedRating = Math.min(Math.max(numericRating, 0), 5);
@@ -399,18 +312,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('');
 
+        // Обработчики событий для кнопок
         container.querySelectorAll('.btn-buy').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Логика быстрого заказа
-            });
+            btn.addEventListener('click', (e) => e.stopPropagation());
         });
 
         container.querySelectorAll('.btn-cart').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Логика корзины
-            });
+            btn.addEventListener('click', (e) => e.stopPropagation());
         });
     }
 

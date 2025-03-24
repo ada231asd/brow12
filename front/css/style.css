@@ -242,7 +242,7 @@ footer .sm .bat_sm a {
 }
 .product-card img {
   margin-left: 51px;
-  margin-top: 67px;
+  margin-top: 20px;
   width: 224px;
   height: 224px;
   background-color: white;
@@ -262,7 +262,24 @@ footer .sm .bat_sm a {
   right: 0;
   position: relative;
   left: 193px;
-  margin-top: 35px;
+  margin-top: 20px;
+}
+
+.no-status {
+  z-index: 1;
+  display: flex;
+  max-width: 122px;
+  max-height: 31px;
+  min-width: 98px;
+  color: white;
+  font-size: 16px;
+  font-family: "Exo 2", sans-serif;
+  border-radius: 4%;
+  justify-content: center;
+  right: 0;
+  position: relative;
+  left: 193px;
+  margin-top: 40px;
 }
 
 .new {
@@ -461,6 +478,10 @@ h3 {
 
 .catalog {
   display: flex;
+  margin-top: 35px;
+  max-width: 1489px;
+  gap: 90px;
+  margin-left: 110px;
 }
 
 .filter_cont {
@@ -501,45 +522,119 @@ h3 {
   text-decoration: underline;
 }
 
-.price-controls {
-  margin: 15px 0;
+.search-container {
+  max-width: 350px;
+  max-height: 50px;
+  font-size: 18px;
+  margin-right: 445px;
+}
+.search-container #searchInput {
+  background-color: #141414;
+  box-shadow: none;
+  border: none;
+  border-bottom: #C8CACB solid 1px;
+  color: white;
 }
 
-.price-inputs {
+.categories-list {
+  display: grid;
+  align-content: center;
+  justify-content: space-evenly;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  gap: 11px;
+}
+
+.rating-filter {
+  display: grid;
+  align-content: center;
+  justify-content: space-evenly;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  gap: 11px;
+}
+.rating-filter h3 {
+  margin-right: 225px;
+}
+
+/* Стили для активных фильтров */
+.filter-btn.active,
+.rating-btn.active,
+.category-btn.active {
+  background: #6A1B9A !important;
+  color: white !important;
+  border-color: #6A1B9A !important;
+  position: relative;
+}
+
+/* Эффекты при наведении */
+.rating-btn:hover,
+.filter-btn:hover,
+.category-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.no-results {
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  width: 100%;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.no-results-content {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.no-results-image {
+  margin-bottom: 30px;
+}
+
+.no-results-title {
+  font-size: 24px;
+  color: #2C2C2C;
   margin-bottom: 15px;
 }
 
-.price-inputs input {
-  width: 120px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+.no-results-text {
+  color: #666;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-#applyPriceBtn {
-  padding: 8px 20px;
-  background-color: #6A48A6;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-#applyPriceBtn:hover {
-  background-color: #5D3F8E;
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #6A1B9A;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
 
-.noUi-target {
-  margin: 15px 0;
-}
-
-.noUi-handle {
-  width: 20px !important;
-  height: 20px !important;
-  right: -10px !important;
-  background: #6A48A6 !important;
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }/*# sourceMappingURL=style.css.map */
