@@ -1,16 +1,35 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . '/../backend/ajax/db.php';
 
 $response = ['status' => 'error', 'message' => 'Неизвестная ошибка'];
 
 try {
-    // Проверка авторизации
-    if (empty($_SESSION['user']['id'])) {
+    // Проверка авторизации через куки (как в get_full_user.php)
+    if (empty($_COOKIE['auth_token'])) {
+        http_response_code(401);
         throw new Exception('Доступ запрещен: требуется авторизация');
     }
-    $userId = $_SESSION['user']['id'];
+
+    // Получаем user_id по токену
+    $stmt = $pdo->prepare("
+        SELECT u.user_id 
+        FROM User_Sessions s
+        JOIN Users u ON s.user_id = u.user_id
+        WHERE s.token = ? AND s.expires_at > NOW()
+    ");
+    $stmt->execute([$_COOKIE['auth_token']]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        http_response_code(401);
+        throw new Exception('Недействительная сессия. Пожалуйста, войдите снова.');
+    }
+
+    $userId = $user['user_id'];
 
     // Получение данных из запроса
     $input = json_decode(file_get_contents('php://input'), true);
@@ -50,8 +69,12 @@ try {
     ];
 
 } catch (PDOException $e) {
+    http_response_code(500);
     $response['message'] = 'Ошибка базы данных: ' . $e->getMessage();
 } catch (Exception $e) {
+    if (!isset($http_response_code)) {
+        http_response_code(400);
+    }
     $response['message'] = $e->getMessage();
 }
 

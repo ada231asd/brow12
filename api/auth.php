@@ -1,6 +1,8 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . '/../backend/ajax/db.php';
 
 $response = ['status' => 'error', 'message' => 'Неизвестная ошибка'];
@@ -36,37 +38,94 @@ try {
                 $response = ['status' => 'success', 'message' => 'Регистрация успешна!'];
                 break;
 
-            case 'login':
-                // Валидация данных авторизации
-                if (empty($data['email']) || empty($data['password'])) {
-                    throw new Exception('Все поля обязательны для заполнения');
-                }
+                case 'login':
+                    if (empty($data['email']) || empty($data['password'])) {
+                        throw new Exception('Все поля обязательны для заполнения');
+                    }
+    
+                    $stmt = $pdo->prepare("SELECT * FROM Users WHERE email = ?");
+                    $stmt->execute([$data['email']]);
+                    $user = $stmt->fetch();
+    
+                    if (!$user || !password_verify($data['password'], $user['password_hash'])) {
+                        throw new Exception('Неверный email или пароль');
+                    }
+    
+                    // Генерация токена
+                    $token = bin2hex(random_bytes(32));
+                    $expires = time() + (86400 * 30); // 30 дней
+                    
+                    // Сохранение токена в БД
+                    $stmt = $pdo->prepare("INSERT INTO User_Sessions (user_id, token, expires_at) VALUES (?, ?, FROM_UNIXTIME(?))");
+                    $stmt->execute([$user['user_id'], $token, $expires]);
+    
+                    // Установка куки
+                    setcookie('auth_token', $token, [
+                        'expires' => $expires,
+                        'path' => '/',
+                        'secure' => true,
+                        'httponly' => true,
+                        'samesite' => 'Strict'
+                    ]);
+    
+                    $response = [
+                        'status' => 'success',
+                        'user' => [
+                            'id' => $user['user_id'],
+                            'name' => $user['name'],
+                            'email' => $user['email'],
+                            'role' => $user['role']
+                        ]
+                    ];
+                    break;
 
-                // Поиск пользователя
-                $stmt = $pdo->prepare("SELECT * FROM Users WHERE email = ?");
-                $stmt->execute([$data['email']]);
-                $user = $stmt->fetch();
-
-                if (!$user || !password_verify($data['password'], $user['password_hash'])) {
-                    throw new Exception('Неверный email или пароль');
-                }
-
-                // Сохранение в сессию
-                $_SESSION['user'] = [
-                    'id' => $user['user_id'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'role' => $user['role']
-                ];
-
-                $response = ['status' => 'success', 'user' => $_SESSION['user']];
-                break;
-
-            default:
-                throw new Exception('Неизвестное действие');
+                    case 'logout':
+                        if (isset($_COOKIE['auth_token'])) {
+                            // Удаление токена из БД
+                            $stmt = $pdo->prepare("DELETE FROM User_Sessions WHERE token = ?");
+                            $stmt->execute([$_COOKIE['auth_token']]);
+                            
+                            // Удаление куки
+                            setcookie('auth_token', '', [
+                                'expires' => time() - 3600,
+                                'path' => '/'
+                            ]);
+                        }
+                        $response = ['status' => 'success', 'message' => 'Вы успешно вышли'];
+                        break;
+                        case 'check':
+                            if (!empty($_COOKIE['auth_token'])) {
+                                $stmt = $pdo->prepare("
+                                    SELECT u.* FROM User_Sessions s
+                                    JOIN Users u ON s.user_id = u.user_id
+                                    WHERE s.token = ? AND s.expires_at > NOW()
+                                ");
+                                $stmt->execute([$_COOKIE['auth_token']]);
+                                $user = $stmt->fetch();
+            
+                                if ($user) {
+                                    $response = [
+                                        'status' => 'success',
+                                        'user' => [
+                                            'id' => $user['user_id'],
+                                            'name' => $user['name'],
+                                            'email' => $user['email'],
+                                            'role' => $user['role']
+                                        ]
+                                    ];
+                                    break;
+                                }
+                            }
+                            http_response_code(401);
+                            throw new Exception('Требуется авторизация');
+                            break;
+            
+                        default:
+                            throw new Exception('Неизвестное действие');
         }
     }
 } catch (PDOException $e) {
+    http_response_code(500);
     $response['message'] = 'Ошибка базы данных: ' . $e->getMessage();
 } catch (Exception $e) {
     $response['message'] = $e->getMessage();

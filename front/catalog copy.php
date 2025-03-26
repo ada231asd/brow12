@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Каталог</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css">
+    <script src="js/auth-guard.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div class="user-menu" style="display: none;">
+    <img class="user-avatar" alt="Аватар">
+    <span class="user-name"></span>
+  </div>
+
 <?php require '../Header/header.html'; ?>
 <div class="catalog">
     <div class="filter_cont">
