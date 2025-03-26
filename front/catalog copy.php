@@ -14,7 +14,6 @@
     <img class="user-avatar" alt="Аватар">
     <span class="user-name"></span>
   </div>
-
 <?php require '../Header/header.html'; ?>
 <div class="catalog">
     <div class="filter_cont">

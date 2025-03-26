@@ -648,3 +648,80 @@ h3{
 .favorite-btn.active svg path {
     fill: #8A33FD;
 }
+
+.comparison-btn {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.comparison-btn:hover {
+    background-color: rgba(138, 51, 253, 0.1);
+}
+
+.comparison-btn.active {
+    background-color: rgba(138, 51, 253, 0.1);
+}
+
+.comparison-btn.active svg path {
+    fill: #8A33FD;
+}
+.comparison-link{
+    display: flex;
+}
+/* Стили для счетчика сравнения */
+#comparison-counter {
+    display: none;
+    z-index: 1;
+    margin-top: -15px;
+    margin-left: -4px;
+    background-color: #8A33FD;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    text-align: center;
+    line-height: 18px;
+}
+
+/* Стили для кнопки корзины */
+.btn-cart {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #8A33FD;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cart:hover {
+    background-color: #7A2BE8;
+}
+
+.btn-cart svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-cart svg path {
+    fill: white;
+}
+
+/* Стили для счетчика корзины */
+#cart-counter {
+    display: none;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #FF3D00;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    text-align: center;
+    line-height: 18px;
+}

@@ -25,8 +25,34 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSorting();
         setupResetButton();
         setupSearch();
+        loadComparisonState();
     }
 
+    async function loadComparisonState() {
+        try {
+            const response = await fetch('../api/get_full_user.php', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            
+            if (data.status === 'success' && data.data.comparisons) {
+                // Обновляем счетчик
+                updateComparisonCounter(data.data.comparisons.length);
+                
+                // Помечаем активные кнопки сравнения
+                data.data.comparisons.forEach(product => {
+                    const btn = document.querySelector(`.comparison-btn[data-product-id="${product.product_id}"]`);
+                    if (btn) {
+                        btn.classList.add('active');
+                        const icon = btn.querySelector('svg path');
+                        icon.setAttribute('fill', '#8A33FD');
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке состояния сравнения:', error);
+        }
+    }
     function setupSearch() {
         const searchInput = document.getElementById('searchInput');
         const noResultsBlock = document.getElementById('noResults');
@@ -63,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         });
     }
-    
 
     async function loadAllCategories() {
         try {

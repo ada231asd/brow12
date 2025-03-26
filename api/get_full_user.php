@@ -145,6 +145,23 @@ try {
     $stmt->execute([$userId]);
     $result['recommendations'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // корзина:
+    $stmt = $pdo->prepare("
+    SELECT 
+        ci.cart_item_id,
+        ci.product_id,
+        ci.quantity,
+        p.name,
+        p.price,
+        p.image_url,
+        p.stock_quantity
+    FROM Cart_Items ci
+    JOIN Products p ON ci.product_id = p.product_id
+    WHERE ci.cart_id = (SELECT cart_id FROM Cart WHERE user_id = ?)
+");
+$stmt->execute([$userId]);
+$result['cart'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     $response = [
         'status' => 'success',
         'data' => $result
