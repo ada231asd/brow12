@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupResetButton();
         setupSearch();
         loadComparisonState();
+        loadCartState();
     }
 
     async function loadComparisonState() {
@@ -53,6 +54,50 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Ошибка при загрузке состояния сравнения:', error);
         }
     }
+    //загрузка состояния корзины
+    async function loadCartState() {
+        try {
+            const response = await fetch('../api/get_full_user.php', {
+                credentials: 'include'
+            });
+            
+            if (response.status === 401) {
+                // Пользователь не авторизован
+                updateCartCounter(0);
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const cartCount = data.data.cart?.length || 0;
+                updateCartCounter(cartCount);
+            } else {
+                console.error('Ошибка в ответе:', data.message);
+                updateCartCounter(0);
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке состояния корзины:', error);
+            updateCartCounter(0);
+        }
+    }
+
+    // Функция для обновления счетчика корзины
+    function updateCartCounter(count) {
+        const counter = document.getElementById('cart-counter');
+        if (counter) {
+            counter.textContent = count;
+            counter.style.display = count > 0 ? 'block' : 'none';
+            
+            // Также можно обновить другие элементы, отображающие количество товаров
+            const cartIcons = document.querySelectorAll('.cart-icon .counter');
+            cartIcons.forEach(icon => {
+                icon.textContent = count;
+                icon.style.display = count > 0 ? 'block' : 'none';
+            });
+        }
+    }
+    
     function setupSearch() {
         const searchInput = document.getElementById('searchInput');
         const noResultsBlock = document.getElementById('noResults');
@@ -451,9 +496,70 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
-        });      
+        }); 
+        container.querySelectorAll('.btn-cart').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const productCard = e.target.closest('.product-card');
+                const comparisonBtn = productCard.querySelector('.comparison-btn');
+                const productId = comparisonBtn.dataset.productId;
+                
+                if (!productId) {
+                    console.error('Product ID not found');
+                    return;
+                }
+                
+                try {
+                    // 1. Добавляем товар в корзину
+                    const addResponse = await fetch('../api/add_to_cart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: productId })
+                    });
+                    
+                    const addResult = await addResponse.json();
+                    
+                    if (addResult.status === 'success') {
+                        // 2. После успешного добавления запрашиваем обновленные данные пользователя
+                        const userResponse = await fetch('../api/get_full_user.php', {
+                            credentials: 'include'
+                        });
+                        
+                        const userData = await userResponse.json();
+                        
+                        if (userData.status === 'success') {
+                            // 3. Обновляем счетчик корзины
+                            const cartCount = userData.data.cart?.length || 0;
+                            updateCartCounter(cartCount);
+                            
+                            // 4. Показываем уведомление и анимацию
+                            showNotification(addResult.message);
+                            animateCartButton(btn);
+                        } else {
+                            showNotification('Не удалось обновить данные корзины', 'error');
+                        }
+                    } else {
+                        showNotification(addResult.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Ошибка при работе с корзиной:', error);
+                    showNotification('Произошла ошибка', 'error');
+                }
+            });
+        });    
     }
-
+// Функция для анимации кнопки корзины
+function animateCartButton(button) {
+    button.classList.add('animate');
+    setTimeout(() => {
+        button.classList.remove('animate');
+    }, 1000);
+}
     // Функция для обновления счетчика сравнения
 function updateComparisonCounter(count) {
     const counter = document.getElementById('comparison-counter');
