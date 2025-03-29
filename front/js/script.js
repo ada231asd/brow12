@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initFilters() {
         await loadAllCategories();
+        await loadUserData(); // Загружаем данные пользователя перед загрузкой товаров
         await loadProducts();
         setupEventListeners();
     }
@@ -25,33 +26,66 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSorting();
         setupResetButton();
         setupSearch();
-        loadComparisonState();
         loadCartState();
     }
-
-    async function loadComparisonState() {
+    async function loadUserData() {
         try {
             const response = await fetch('../api/get_full_user.php', {
                 credentials: 'include'
             });
             const data = await response.json();
             
-            if (data.status === 'success' && data.data.comparisons) {
-                // Обновляем счетчик
-                updateComparisonCounter(data.data.comparisons.length);
+            if (data.status === 'success') {
+                window.userData = {
+                    favorites: data.data.favorites || [],
+                    comparisons: data.data.comparisons || [],
+                    cart: data.data.cart || []
+                };
                 
-                // Помечаем активные кнопки сравнения
-                data.data.comparisons.forEach(product => {
-                    const btn = document.querySelector(`.comparison-btn[data-product-id="${product.product_id}"]`);
-                    if (btn) {
-                        btn.classList.add('active');
-                        const icon = btn.querySelector('svg path');
-                        icon.setAttribute('fill', '#8A33FD');
-                    }
-                });
+                updateComparisonCounter(window.userData.comparisons.length);
+                updateCartCounter(window.userData.cart.length);
             }
         } catch (error) {
-            console.error('Ошибка при загрузке состояния сравнения:', error);
+            console.error('Ошибка загрузки данных пользователя:', error);
+        }
+    }
+    async function handleComparisonClick(btn) {
+        const productId = btn.dataset.productId;
+        const wasActive = btn.classList.contains('active');
+        
+        try {
+            // 1. Мгновенное визуальное обновление
+            btn.classList.toggle('active', !wasActive);
+            const icon = btn.querySelector('svg path');
+            if (icon) icon.style.fill = !wasActive ? '#8A33FD' : '#C8CACB';
+
+            // 2. Отправка на сервер
+            const response = await fetch('../api/add_to_comparison.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ product_id: productId })
+            });
+
+            // 3. Проверка ответа
+            const result = await response.json();
+            if (result.status !== 'success') throw new Error(result.message);
+            
+            // 4. Обновление данных
+            await loadUserData();
+            
+            // 5. Обновление счетчика
+            updateComparisonCounter(window.userData.comparisons.length);
+            
+        } catch (error) {
+            console.error('Ошибка:', error);
+            // Возвращаем исходное состояние
+            btn.classList.toggle('active', wasActive);
+            const icon = btn.querySelector('svg path');
+            if (icon) icon.style.fill = wasActive ? '#8A33FD' : '#C8CACB';
+            
+            // Показываем уведомление об ошибке
+            showNotification(error.message || 'Ошибка при обновлении сравнения', 'error');
         }
     }
     //загрузка состояния корзины
@@ -159,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             let apiUrl;
             let params;
-    
+        
             if (currentFilters.searchQuery) {
                 apiUrl = '../api/search.php';
                 params = new URLSearchParams({ query: currentFilters.searchQuery });
@@ -172,27 +206,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentFilters.filter) params.append('filter', currentFilters.filter);
                 if (currentFilters.sort) params.append('sort', currentFilters.sort);
             }
-    
+        
             const response = await fetch(`${apiUrl}?${params}`);
             const data = await response.json();
             
             if (data.status === 'success') {
-                // Загружаем избранное пользователя
-                const favoritesResponse = await fetch('../api/get_full_user.php');
-                const favoritesData = await favoritesResponse.json();
+                const favoriteIds = window.userData?.favorites?.map(item => item.product_id) || [];
+                const comparisonIds = window.userData?.comparisons?.map(item => item.product_id) || [];
                 
-                let favoriteProductIds = [];
-                if (favoritesData.status === 'success' && favoritesData.data.favorites) {
-                    favoriteProductIds = favoritesData.data.favorites.map(item => item.product_id);
-                }
-                
-                renderProducts(data.data, 'products-container', favoriteProductIds);
-            } else {
-                throw new Error(data.message || 'Ошибка сервера');
+                renderProducts(data.data, 'products-container', favoriteIds, comparisonIds);
             }
         } catch (error) {
             console.error('Ошибка загрузки продуктов:', error);
-            document.getElementById('products-container').innerHTML = '';
             document.getElementById('noResults').style.display = 'flex';
         }
     }
@@ -273,9 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function setupResetButton() {
+    async function setupResetButton() {
         const resetBtn = document.getElementById('resetFilters');
-        resetBtn.addEventListener('click', () => {
+        resetBtn.addEventListener('click', async () => {
             currentFilters = { 
                 rating: 0, 
                 category: null, 
@@ -287,16 +312,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
             document.getElementById('sortSelect').value = '';
             document.getElementById('searchInput').value = '';
-            document.getElementById('searchStatus').textContent = '';
             document.getElementById('noResults').style.display = 'none';
-            loadProducts();
+            
+            // Обновляем данные пользователя перед повторной загрузкой
+            await loadUserData();
+            await loadProducts();
         });
     }
 
     function renderProducts(products, containerId, favoriteProductIds = []) {
         const container = document.getElementById(containerId);
         const noResultsBlock = document.getElementById('noResults');
-        
+        const comparisonIds = window.userData?.comparisons?.map(item => item.product_id) || [];
+        const favoriteIds = window.userData?.favorites?.map(item => item.product_id) || [];
         if (!container || !noResultsBlock) return;
 
         // Управление отображением результатов
@@ -372,9 +400,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <path d="M19.1603 2.00017C18.1002 0.937373 16.6951 0.288706 15.1986 0.171335C13.7021 0.0539653 12.213 0.475631 11.0003 1.36017C9.72793 0.413803 8.14427 -0.0153233 6.5682 0.159203C4.99212 0.333729 3.54072 1.09894 2.50625 2.30075C1.47178 3.50256 0.931098 5.05169 0.993077 6.63618C1.05506 8.22067 1.71509 9.72283 2.84028 10.8402L9.05028 17.0602C9.57029 17.5719 10.2707 17.8588 11.0003 17.8588C11.7299 17.8588 12.4303 17.5719 12.9503 17.0602L19.1603 10.8402C20.3279 9.66543 20.9832 8.07644 20.9832 6.42017C20.9832 4.76389 20.3279 3.1749 19.1603 2.00017ZM17.7503 9.46017L11.5403 15.6702C11.4696 15.7415 11.3855 15.7982 11.2928 15.8368C11.2001 15.8755 11.1007 15.8954 11.0003 15.8954C10.8999 15.8954 10.8004 15.8755 10.7077 15.8368C10.615 15.7982 10.5309 15.7415 10.4603 15.6702L4.25028 9.43017C3.46603 8.62851 3.02689 7.55163 3.02689 6.43017C3.02689 5.3087 3.46603 4.23182 4.25028 3.43017C5.04943 2.64115 6.12725 2.19873 7.25028 2.19873C8.3733 2.19873 9.45112 2.64115 10.2503 3.43017C10.3432 3.52389 10.4538 3.59829 10.5757 3.64906C10.6976 3.69983 10.8283 3.72596 10.9603 3.72596C11.0923 3.72596 11.223 3.69983 11.3449 3.64906C11.4667 3.59829 11.5773 3.52389 11.6703 3.43017C12.4694 2.64115 13.5472 2.19873 14.6703 2.19873C15.7933 2.19873 16.8711 2.64115 17.6703 3.43017C18.4653 4.22132 18.9189 5.29236 18.9338 6.41385C18.9488 7.53535 18.5239 8.6181 17.7503 9.43017V9.46017Z" fill="${favoriteProductIds.includes(product.product_id) ? '#8A33FD' : '#C8CACB'}"/>
                                 </svg>
                             </div>
-                             <div class="button comparison-btn" data-product-id="${product.product_id}">
+                                 <div class="button comparison-btn ${comparisonIds.includes(product.product_id) ? 'active' : ''}" data-product-id="${product.product_id}">
                 <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 10C0.734784 10 0.48043 10.1054 0.292893 10.2929C0.105357 10.4804 0 10.7348 0 11V19C0 19.2652 0.105357 19.5196 0.292893 19.7071C0.48043 19.8946 0.734784 20 1 20C1.26522 20 1.51957 19.8946 1.70711 19.7071C1.89464 19.5196 2 19.2652 2 19V11C2 10.7348 1.89464 10.4804 1.70711 10.2929C1.51957 10.1054 1.26522 10 1 10ZM6 0C5.73478 0 5.48043 0.105357 5.29289 0.292893C5.10536 0.48043 5 0.734784 5 1V19C5 19.2652 5.10536 19.5196 5.29289 19.7071C5.48043 19.8946 5.73478 20 6 20C6.26522 20 6.51957 19.8946 6.70711 19.7071C6.89464 19.5196 7 19.2652 7 19V1C7 0.734784 6.89464 0.48043 6.70711 0.292893C6.51957 0.105357 6.26522 0 6 0ZM16 14C15.7348 14 15.4804 14.1054 15.2929 14.2929C15.1054 14.4804 15 14.7348 15 15V19C15 19.2652 15.1054 19.5196 15.2929 19.7071C15.4804 19.8946 15.7348 20 16 20C16.2652 20 16.5196 19.8946 16.7071 19.7071C16.8946 19.5196 17 19.2652 17 19V15C17 14.7348 16.8946 14.4804 16.7071 14.2929C16.5196 14.1054 16.2652 14 16 14ZM11 6C10.7348 6 10.4804 6.10536 10.2929 6.29289C10.1054 6.48043 10 6.73478 10 7V19C10 19.2652 10.1054 19.5196 10.2929 19.7071C10.4804 19.8946 10.7348 20 11 20C11.2652 20 11.5196 19.8946 11.7071 19.7071C11.8946 19.5196 12 19.2652 12 19V7C12 6.73478 11.8946 6.48043 11.7071 6.29289C11.5196 6.10536 11.2652 6 11 6Z" fill="#C8CACB"/>
+                    <path d="M1 10C0.734784 10 0.48043 10.1054 0.292893 10.2929C0.105357 10.4804 0 10.7348 0 11V19C0 19.2652 0.105357 19.5196 0.292893 19.7071C0.48043 19.8946 0.734784 20 1 20C1.26522 20 1.51957 19.8946 1.70711 19.7071C1.89464 19.5196 2 19.2652 2 19V11C2 10.7348 1.89464 10.4804 1.70711 10.2929C1.51957 10.1054 1.26522 10 1 10ZM6 0C5.73478 0 5.48043 0.105357 5.29289 0.292893C5.10536 0.48043 5 0.734784 5 1V19C5 19.2652 5.10536 19.5196 5.29289 19.7071C5.48043 19.8946 5.73478 20 6 20C6.26522 20 6.51957 19.8946 6.70711 19.7071C6.89464 19.5196 7 19.2652 7 19V1C7 0.734784 6.89464 0.48043 6.70711 0.292893C6.51957 0.105357 6.26522 0 6 0ZM16 14C15.7348 14 15.4804 14.1054 15.2929 14.2929C15.1054 14.4804 15 14.7348 15 15V19C15 19.2652 15.1054 19.5196 15.2929 19.7071C15.4804 19.8946 15.7348 20 16 20C16.2652 20 16.5196 19.8946 16.7071 19.7071C16.8946 19.5196 17 19.2652 17 19V15C17 14.7348 16.8946 14.4804 16.7071 14.2929C16.5196 14.1054 16.2652 14 16 14ZM11 6C10.7348 6 10.4804 6.10536 10.2929 6.29289C10.1054 6.48043 10 6.73478 10 7V19C10 19.2652 10.1054 19.5196 10.2929 19.7071C10.4804 19.8946 10.7348 20 11 20C11.2652 20 11.5196 19.8946 11.7071 19.7071C11.8946 19.5196 12 19.2652 12 19V7C12 6.73478 11.8946 6.48043 11.7071 6.29289C11.5196 6.10536 11.2652 6 11 6Z" fill="${comparisonIds.includes(product.product_id) ? '#8A33FD' : '#C8CACB'}"/>
                 </svg>
             </div>
                         </div>
@@ -416,43 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        credentials: 'include', // важно для отправки кук
-                        body: JSON.stringify({ product_id: productId })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        // Обновляем состояние кнопки
-                        btn.classList.toggle('active');
-                        const path = btn.querySelector('path');
-                        path.setAttribute('fill', btn.classList.contains('active') ? '#8A33FD' : '#C8CACB');
-                        
-                        // Обновляем список избранного
-                        await updateFavoritesList();
-                    } else {
-                        console.error(result.message);
-                        alert(result.message);
-                    }
-                } catch (error) {
-                    console.error('Ошибка при добавлении в избранное:', error);
-                    alert('Произошла ошибка при обновлении избранного');
-                }
-            });
-        });  
-        container.querySelectorAll('.comparison-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const productId = btn.dataset.productId;
-                
-                try {
-                    const response = await fetch('../api/add_to_comparison.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
                         credentials: 'include',
                         body: JSON.stringify({ product_id: productId })
                     });
@@ -465,22 +456,62 @@ document.addEventListener('DOMContentLoaded', () => {
                         const icon = btn.querySelector('svg path');
                         icon.setAttribute('fill', btn.classList.contains('active') ? '#8A33FD' : '#C8CACB');
                         
-                        // Обновляем счетчик сравнения
-                        updateComparisonCounter(result.count);
-                        
-                        // Показываем уведомление
-                        showNotification(result.message);
-                        
-                        // Если это первый товар для сравнения - показываем панель сравнения
-                        if (result.action === 'added' && result.count === 1) {
-                            showComparisonPanel();
-                        }
-                    } else {
-                        showNotification(result.message, 'error');
+                        // Добавляем обновление данных пользователя
+                        await loadUserData();
                     }
                 } catch (error) {
-                    console.error('Ошибка при добавлении в сравнение:', error);
-                    showNotification('Произошла ошибка', 'error');
+                    console.error('Ошибка при добавлении в избранное:', error);
+                }
+            });
+        });
+        //для сравнения
+        container.querySelectorAll('.comparison-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const productId = btn.dataset.productId;
+                const wasActive = btn.classList.contains('active');
+        
+                // 1. Мгновенное визуальное обновление
+                btn.classList.toggle('active', !wasActive);
+                const icon = btn.querySelector('svg path');
+                if (icon) {
+                    icon.style.fill = !wasActive ? '#8A33FD' : '#C8CACB';
+                }
+        
+                try {
+                    // 2. Отправка запроса на сервер
+                    await fetch('../api/add_to_comparison.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: productId })
+                    });
+        
+                    // 3. Обновление данных через вашу функцию
+                    await loadUserData();
+        
+                    // 4. Проверка актуального состояния
+                    const isActuallyCompared = window.userData.comparisons.some(
+                        item => item.product_id == productId
+                    );
+        
+                    // 5. Коррекция состояния если нужно
+                    if (isActuallyCompared !== !wasActive) {
+                        btn.classList.toggle('active');
+                        if (icon) {
+                            icon.style.fill = isActuallyCompared ? '#8A33FD' : '#C8CACB';
+                        }
+                    }
+        
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    // Возврат к исходному состоянию
+                    btn.classList.toggle('active', wasActive);
+                    if (icon) {
+                        icon.style.fill = wasActive ? '#8A33FD' : '#C8CACB';
+                    }
                 }
             });
         });
@@ -586,20 +617,6 @@ function showComparisonPanel() {
     // Реализация зависит от вашего интерфейса
     console.log('Показываем панель сравнения');
 }
-    async function updateFavoritesList() {
-        try {
-            const response = await fetch('../api/get_full_user.php', {
-                credentials: 'include' // важно для отправки кук
-            });
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                // Можно обновить глобальное состояние избранного
-                window.favoriteProductIds = data.data.favorites.map(item => item.product_id);
-            }
-        } catch (error) {
-            console.error('Ошибка при обновлении списка избранного:', error);
-        }
-    }
+
     initFilters();
 });
