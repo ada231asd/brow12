@@ -1,7 +1,7 @@
 <?php
 // db.php
 $host = 'localhost'; // Хост базы данных
-$dbname = 'pk-st'; // Имя базы данных ComputerStore
+$dbname = 'pk_st'; // Имя базы данных ComputerStore
 $username = 'root'; // Имя пользователя базы данных
 $password = ''; // Пароль к базе данных (если есть)
 

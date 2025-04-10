@@ -99,6 +99,33 @@
             });
         });
 
+       // Проверка активной сессии при загрузке страницы
+       document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('../api/auth.php?action=check');
+                const result = await response.json();
+                if (result.status === 'success') {
+                    redirectToRolePage(result.user.role);
+                }
+            } catch (error) {
+                console.log('Пользователь не авторизован');
+            }
+        });
+
+        // Функция перенаправления по ролям
+        function redirectToRolePage(role) {
+            switch(role) {
+                case 'admin':
+                    window.location.href = '../cab/admin/admin.php';
+                    break;
+                case 'manager':
+                    window.location.href = '../cab/polzovatel/polzovatel.php';
+                    break;
+                default:
+                    window.location.href = 'catalog copy.php';
+            }
+        }
+
         // Обработка форм
         async function handleFormSubmit(form, action) {
             const formData = new FormData(form);
@@ -113,8 +140,10 @@
                 });
 
                 const result = await response.json();
+                
                 if (result.status === 'success') {
-                    window.location.href = 'catalog copy.php';
+                    // Перенаправляем в зависимости от роли
+                    redirectToRolePage(result.user.role);
                 } else {
                     errorElement.textContent = result.message;
                 }
