@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemHTML = `
                 <div class="cart-item" data-id="${item.cart_item_id}">
                     <div class="cart-item-image">
-                        <img src="${item.image_url || '/images/no-image.jpg'}" alt="${item.name}">
+                        <img src="../${item.image_url || '/images/no-image.jpg'}" alt="${item.name}">
                     </div>
                     <div class="cart-item-info">
                         <h3 class="cart-item-title">${item.name}</h3>

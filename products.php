@@ -10,7 +10,7 @@ try {
         p.product_id,
         p.name AS product_name,
         c.name AS category_name,
-        CONCAT('backend/', p.image_url) AS image_url,
+        CONCAT(p.image_url) AS image_url,
         p.is_new,
         p.is_bestseller,
         COALESCE(ROUND(AVG(r.rating)), 0) AS average_rating,

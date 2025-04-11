@@ -78,6 +78,9 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        p{
+            color: #000;
+        }
 
         @media (max-width: 768px) {
             .news-grid {
@@ -115,7 +118,7 @@
                         data.data.forEach(news => {
                             html += `
                                 <div class="news-card" onclick="showNews(${news.news_id})">
-                                    <img src="${news.image_url}" 
+                                    <img src="../${news.image_url}" 
                                          class="news-image" 
                                          alt="${news.title}" 
                                          loading="lazy">

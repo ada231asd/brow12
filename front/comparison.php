@@ -110,7 +110,7 @@
                             ${products.map(p => `
                                 <th>
                                     <div style="text-align: center;">
-                                        <img src="${p.image_url || ''}" 
+                                        <img src="../${p.image_url || ''}" 
                                              class="product-image"
                                              onerror="this.style.display='none'">
                                         <h3 style="margin: 5px 0;">${p.name}</h3>

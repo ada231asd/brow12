@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -168,6 +167,10 @@
                     <li><a href="#" data-section="users">Пользователи</a></li>
                     <li><a href="#" data-section="orders">Заказы</a></li>
                     <li><a href="#" data-section="products">Продукты</a></li>
+                    <li><a href="#" data-section="categories">Категории</a></li>
+                    <li><a href="#" data-section="characteristics">Характеристики</a></li>
+                    <li><a href="#" data-section="news">Новости</a></li>
+                    <li><a href="#" data-section="promotions">Акции</a></li>
                 </ul>
             </nav>
         </div>
@@ -260,10 +263,96 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <div id="categories" class="section hidden">
+                <h2>Категории</h2>
+                <div class="action-buttons">
+                    <button onclick="openAddCategoryModal()">Добавить категорию</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="category-search" placeholder="Поиск по названию" oninput="loadData('categories', this.value)">
+                </div>
+                <table id="categories-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="characteristics" class="section hidden">
+                <h2>Характеристики</h2>
+                <div class="action-buttons">
+                    <button onclick="openAddCharacteristicModal()">Добавить характеристику</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="characteristic-search" placeholder="Поиск по названию" oninput="loadData('characteristics', this.value)">
+                </div>
+                <table id="characteristics-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Тип значения</th>
+                            <th>Категория</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="news" class="section hidden">
+                <h2>Новости</h2>
+                <div class="action-buttons">
+                    <button onclick="openAddNewsModal()">Добавить новость</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="news-search" placeholder="Поиск по заголовку" oninput="loadData('news', this.value)">
+                </div>
+                <table id="news-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Заголовок</th>
+                            <th>Изображение</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="promotions" class="section hidden">
+                <h2>Акции</h2>
+                <div class="action-buttons">
+                    <button onclick="openAddPromotionModal()">Добавить акцию</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="promotion-search" placeholder="Поиск по заголовку" oninput="loadData('promotions', this.value)">
+                </div>
+                <table id="promotions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Заголовок</th>
+                            <th>Изображение</th>
+                            <th>Категория</th>
+                            <th>Дата начала</th>
+                            <th>Дата окончания</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Модальное окно для редактирования пользователя -->
+    <!-- Модальные окна -->
+    <!-- Пользователи -->
     <div id="edit-user-modal" class="modal">
         <div class="modal-content">
             <h3>Редактировать пользователя</h3>
@@ -276,9 +365,7 @@
                 <input type="email" name="email" required>
                 <div class="error" id="edit-user-email-error">Пожалуйста, введите корректный email</div>
                 <label>Роль:</label>
-                <select name="role_id" required>
-                    <!-- Заполняется динамически -->
-                </select>
+                <select name="role_id" required></select>
                 <div class="error" id="edit-user-role-error">Пожалуйста, выберите роль</div>
                 <label>Телефон:</label>
                 <input type="text" name="phone">
@@ -296,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно для редактирования заказа -->
+    <!-- Заказы -->
     <div id="edit-order-modal" class="modal">
         <div class="modal-content">
             <h3>Редактировать заказ</h3>
@@ -322,29 +409,26 @@
         </div>
     </div>
 
-    <!-- Модальное окно для добавления продукта -->
+    <!-- Продукты -->
     <div id="add-product-modal" class="modal">
         <div class="modal-content">
             <h3>Добавить продукт</h3>
             <form id="add-product-form" enctype="multipart/form-data">
                 <label>Название:</label>
                 <input type="text" name="name" required>
-                <div class="error" id="add-product-name-error">Пожалуйста, введите название продукта</div>
+                <div class="error" id="add-product-name-error">Пожалуйста, введите название</div>
                 <label>Описание:</label>
                 <textarea name="description"></textarea>
                 <label>Цена:</label>
                 <input type="number" name="price" step="0.01" min="0" required>
-                <div class="error" id="add-product-price-error">Пожалуйста, введите корректную цену (больше или равно 0)</div>
+                <div class="error" id="add-product-price-error">Пожалуйста, введите корректную цену</div>
                 <label>Количество на складе:</label>
                 <input type="number" name="stock_quantity" min="0" required>
-                <div class="error" id="add-product-stock-error">Пожалуйста, введите количество (больше или равно 0)</div>
+                <div class="error" id="add-product-stock-error">Пожалуйста, введите количество</div>
                 <label>Скидка (%):</label>
                 <input type="number" name="discount" step="0.01" min="0" max="100">
-                <div class="error" id="add-product-discount-error">Скидка должна быть от 0 до 100</div>
                 <label>Категория:</label>
-                <select name="category_id" onchange="loadCharacteristics(this.value)">
-                    <!-- Заполняется динамически -->
-                </select>
+                <select name="category_id" onchange="loadCharacteristics(this.value)"></select>
                 <label>Изображение:</label>
                 <input type="file" name="image" accept="image/*">
                 <label>Бестселлер:</label>
@@ -359,8 +443,6 @@
             </form>
         </div>
     </div>
-
-    <!-- Модальное окно для редактирования продукта -->
     <div id="edit-product-modal" class="modal">
         <div class="modal-content">
             <h3>Редактировать продукт</h3>
@@ -368,22 +450,19 @@
                 <input type="hidden" name="product_id">
                 <label>Название:</label>
                 <input type="text" name="name" required>
-                <div class="error" id="edit-product-name-error">Пожалуйста, введите название продукта</div>
+                <div class="error" id="edit-product-name-error">Пожалуйста, введите название</div>
                 <label>Описание:</label>
                 <textarea name="description"></textarea>
                 <label>Цена:</label>
                 <input type="number" name="price" step="0.01" min="0" required>
-                <div class="error" id="edit-product-price-error">Пожалуйста, введите корректную цену (больше или равно 0)</div>
+                <div class="error" id="edit-product-price-error">Пожалуйста, введите корректную цену</div>
                 <label>Количество на складе:</label>
                 <input type="number" name="stock_quantity" min="0" required>
-                <div class="error" id="edit-product-stock-error">Пожалуйста, введите количество (больше или равно 0)</div>
+                <div class="error" id="edit-product-stock-error">Пожалуйста, введите количество</div>
                 <label>Скидка (%):</label>
                 <input type="number" name="discount" step="0.01" min="0" max="100">
-                <div class="error" id="edit-product-discount-error">Скидка должна быть от 0 до 100</div>
                 <label>Категория:</label>
-                <select name="category_id" onchange="loadCharacteristics(this.value)">
-                    <!-- Заполняется динамически -->
-                </select>
+                <select name="category_id" onchange="loadCharacteristics(this.value)"></select>
                 <label>Изображение:</label>
                 <input type="file" name="image" accept="image/*">
                 <div id="current-image"></div>
@@ -400,8 +479,168 @@
         </div>
     </div>
 
+    <!-- Категории -->
+    <div id="add-category-modal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить категорию</h3>
+            <form id="add-category-form">
+                <label>Название:</label>
+                <input type="text" name="name" required>
+                <div class="buttons">
+                    <button type="submit">Добавить</button>
+                    <button type="button" onclick="closeModal('add-category-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="edit-category-modal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать категорию</h3>
+            <form id="edit-category-form">
+                <input type="hidden" name="category_id">
+                <label>Название:</label>
+                <input type="text" name="name" required>
+                <div class="buttons">
+                    <button type="submit">Сохранить</button>
+                    <button type="button" onclick="closeModal('edit-category-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Характеристики -->
+    <div id="add-characteristic-modal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить характеристику</h3>
+            <form id="add-characteristic-form">
+                <label>Название:</label>
+                <input type="text" name="name" required>
+                <label>Тип значения:</label>
+                <select name="value_type" required>
+                    <option value="Текст">Текст</option>
+                    <option value="Число">Число</option>
+                </select>
+                <label>Категория:</label>
+                <select name="category_id" required></select>
+                <div class="buttons">
+                    <button type="submit">Добавить</button>
+                    <button type="button" onclick="closeModal('add-characteristic-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="edit-characteristic-modal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать характеристику</h3>
+            <form id="edit-characteristic-form">
+                <input type="hidden" name="characteristic_id">
+                <label>Название:</label>
+                <input type="text" name="name" required>
+                <label>Тип значения:</label>
+                <select name="value_type" required>
+                    <option value="Текст">Текст</option>
+                    <option value="Число">Число</option>
+                </select>
+                <label>Категория:</label>
+                <select name="category_id" required></select>
+                <div class="buttons">
+                    <button type="submit">Сохранить</button>
+                    <button type="button" onclick="closeModal('edit-characteristic-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Новости -->
+    <div id="add-news-modal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить новость</h3>
+            <form id="add-news-form" enctype="multipart/form-data">
+                <label>Заголовок:</label>
+                <input type="text" name="title" required>
+                <label>Содержание:</label>
+                <textarea name="content" required></textarea>
+                <label>Изображение:</label>
+                <input type="file" name="image" accept="image/*">
+                <div class="buttons">
+                    <button type="submit">Добавить</button>
+                    <button type="button" onclick="closeModal('add-news-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="edit-news-modal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать новость</h3>
+            <form id="edit-news-form" enctype="multipart/form-data">
+                <input type="hidden" name="news_id">
+                <label>Заголовок:</label>
+                <input type="text" name="title" required>
+                <label>Содержание:</label>
+                <textarea name="content" required></textarea>
+                <label>Изображение:</label>
+                <input type="file" name="image" accept="image/*">
+                <div id="current-news-image"></div>
+                <div class="buttons">
+                    <button type="submit">Сохранить</button>
+                    <button type="button" onclick="closeModal('edit-news-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Акции -->
+    <div id="add-promotion-modal" class="modal">
+        <div class="modal-content">
+            <h3>Добавить акцию</h3>
+            <form id="add-promotion-form" enctype="multipart/form-data">
+                <label>Заголовок:</label>
+                <input type="text" name="title" required>
+                <label>Описание:</label>
+                <textarea name="description"></textarea>
+                <label>Дата начала:</label>
+                <input type="date" name="start_date" required>
+                <label>Дата окончания:</label>
+                <input type="date" name="end_date" required>
+                <label>Категория:</label>
+                <select name="category_id"></select>
+                <label>Изображение:</label>
+                <input type="file" name="image" accept="image/*">
+                <div class="buttons">
+                    <button type="submit">Добавить</button>
+                    <button type="button" onclick="closeModal('add-promotion-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="edit-promotion-modal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать акцию</h3>
+            <form id="edit-promotion-form" enctype="multipart/form-data">
+                <input type="hidden" name="promotion_id">
+                <label>Заголовок:</label>
+                <input type="text" name="title" required>
+                <label>Описание:</label>
+                <textarea name="description"></textarea>
+                <label>Дата начала:</label>
+                <input type="date" name="start_date" required>
+                <label>Дата окончания:</label>
+                <input type="date" name="end_date" required>
+                <label>Категория:</label>
+                <select name="category_id"></select>
+                <label>Изображение:</label>
+                <input type="file" name="image" accept="image/*">
+                <div id="current-promotion-image"></div>
+                <div class="buttons">
+                    <button type="submit">Сохранить</button>
+                    <button type="button" onclick="closeModal('edit-promotion-modal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        const API_URL = '/../brow12/api/admin_api.php';
+        const API_URL = '/brow12/api/admin_api.php';
 
         document.addEventListener('DOMContentLoaded', () => {
             const navLinks = document.querySelectorAll('.sidebar nav ul li a');
@@ -414,50 +653,44 @@
                 });
             });
 
-            // Загрузка имени администратора
-            fetch(`${API_URL}?action=get_admin_info`, {
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    document.getElementById('admin-name').textContent = data.data.admin_name;
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
+            fetch(`${API_URL}?action=get_admin_info`, { credentials: 'include' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('admin-name').textContent = data.data.admin_name;
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
 
-            // Показываем аналитику по умолчанию
             showSection('analytics');
             loadData('analytics');
         });
 
         function showSection(sectionId) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.classList.add('hidden');
-            });
+            document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
         }
 
         async function loadData(type, search = '') {
-            try {
-                let url = `${API_URL}?action=get_${type}&search=${encodeURIComponent(search)}`;
-                if (type === 'analytics') {
-                    url = `${API_URL}?action=get_analytics`;
-                }
-                const response = await fetch(url, {
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    if (type === 'analytics') {
-                        document.getElementById('total-users').textContent = data.data.total_users;
-                        document.getElementById('total-orders').textContent = data.data.total_orders;
-                        document.getElementById('total-products').textContent = data.data.total_products;
-                        document.getElementById('total-sales').textContent = data.data.total_sales;
-                    } else if (type === 'users') {
-                        const tbody = document.querySelector('#users-table tbody');
-                        tbody.innerHTML = '';
+    try {
+        let url = `${API_URL}?action=get_${type}&search=${encodeURIComponent(search)}`;
+        if (type === 'analytics') url = `${API_URL}?action=get_analytics`;
+        const response = await fetch(url, { credentials: 'include' });
+        const data = await response.json();
+        if (data.status === 'success') {
+            switch (type) {
+                case 'analytics':
+                    document.getElementById('total-users').textContent = data.data.total_users;
+                    document.getElementById('total-orders').textContent = data.data.total_orders;
+                    document.getElementById('total-products').textContent = data.data.total_products;
+                    document.getElementById('total-sales').textContent = data.data.total_sales;
+                    break;
+                case 'users':
+                    const usersTbody = document.querySelector('#users-table tbody');
+                    usersTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        usersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Пользователи не найдены</td></tr>';
+                    } else {
                         data.data.forEach(user => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -473,11 +706,16 @@
                                     <button onclick="deleteUser(${user.user_id})">Удалить</button>
                                 </td>
                             `;
-                            tbody.appendChild(row);
+                            usersTbody.appendChild(row);
                         });
-                    } else if (type === 'orders') {
-                        const tbody = document.querySelector('#orders-table tbody');
-                        tbody.innerHTML = '';
+                    }
+                    break;
+                case 'orders':
+                    const ordersTbody = document.querySelector('#orders-table tbody');
+                    ordersTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        ordersTbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Заказы не найдены</td></tr>';
+                    } else {
                         data.data.forEach(order => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
@@ -485,7 +723,6 @@
                                 <td>${order.order_code}</td>
                                 <td>${order.user_name} (${order.user_email})</td>
                                 <td>${order.order_status}</td>
-                  
                                 <td>${order.total_price}</td>
                                 <td>${order.delivery_address}</td>
                                 <td>${new Date(order.created_at).toLocaleString()}</td>
@@ -494,16 +731,21 @@
                                     <button onclick="deleteOrder(${order.order_id})">Удалить</button>
                                 </td>
                             `;
-                            tbody.appendChild(row);
+                            ordersTbody.appendChild(row);
                         });
-                    } else if (type === 'products') {
-                        const tbody = document.querySelector('#products-table tbody');
-                        tbody.innerHTML = '';
+                    }
+                    break;
+                case 'products':
+                    const productsTbody = document.querySelector('#products-table tbody');
+                    productsTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        productsTbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Продукты не найдены</td></tr>';
+                    } else {
                         data.data.forEach(product => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td>${product.product_id}</td>
-                                <td>${product.image_url ? `<img src="${product.image_url}" alt="${product.name}" class="product-image">` : 'Нет изображения'}</td>
+                                <td>${product.image_url ? `<img src="/brow12/${product.image_url}" alt="${product.name}" class="product-image">` : 'Нет'}</td>
                                 <td>${product.name}</td>
                                 <td>${product.category_name || 'Без категории'}</td>
                                 <td>${product.price}</td>
@@ -517,187 +759,207 @@
                                     <button onclick="deleteProduct(${product.product_id})">Удалить</button>
                                 </td>
                             `;
-                            tbody.appendChild(row);
+                            productsTbody.appendChild(row);
                         });
                     }
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при загрузке данных');
+                    break;
+                case 'categories':
+                    const categoriesTbody = document.querySelector('#categories-table tbody');
+                    categoriesTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        categoriesTbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Категории не найдены</td></tr>';
+                    } else {
+                        data.data.forEach(category => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${category.category_id}</td>
+                                <td>${category.name}</td>
+                                <td>${category.parent_name || 'Нет'}</td>
+                                <td>
+                                    <button onclick='editCategory(${JSON.stringify(category)})'>Редактировать</button>
+                                    <button onclick="deleteCategory(${category.category_id})">Удалить</button>
+                                </td>
+                            `;
+                            categoriesTbody.appendChild(row);
+                        });
+                    }
+                    break;
+                case 'characteristics':
+                    const characteristicsTbody = document.querySelector('#characteristics-table tbody');
+                    characteristicsTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        characteristicsTbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Характеристики не найдены</td></tr>';
+                    } else {
+                        data.data.forEach(char => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${char.characteristic_id}</td>
+                                <td>${char.name}</td>
+                                <td>${char.value_type}</td>
+                                <td>${char.category_name || 'Без категории'}</td>
+                                <td>
+                                    <button onclick='editCharacteristic(${JSON.stringify(char)})'>Редактировать</button>
+                                    <button onclick="deleteCharacteristic(${char.characteristic_id})">Удалить</button>
+                                </td>
+                            `;
+                            characteristicsTbody.appendChild(row);
+                        });
+                    }
+                    break;
+                case 'news':
+                    const newsTbody = document.querySelector('#news-table tbody');
+                    newsTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        newsTbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Новости не найдены</td></tr>';
+                    } else {
+                        data.data.forEach(news => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${news.news_id}</td>
+                                <td>${news.title}</td>
+                                <td>${news.image_url ? `<img src="/brow12/${news.image_url}" alt="${news.title}" class="product-image">` : 'Нет'}</td>
+                                <td>${new Date(news.created_at).toLocaleString()}</td>
+                                <td>
+                                    <button onclick='editNews(${JSON.stringify(news)})'>Редактировать</button>
+                                    <button onclick="deleteNews(${news.news_id})">Удалить</button>
+                                </td>
+                            `;
+                            newsTbody.appendChild(row);
+                        });
+                    }
+                    break;
+                case 'promotions':
+                    const promotionsTbody = document.querySelector('#promotions-table tbody');
+                    promotionsTbody.innerHTML = '';
+                    if (data.data.length === 0) {
+                        promotionsTbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Акции не найдены</td></tr>';
+                    } else {
+                        data.data.forEach(promo => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${promo.promotion_id}</td>
+                                <td>${promo.title}</td>
+                                <td>${promo.image_url ? `<img src="/brow12/${promo.image_url}" alt="${promo.title}" class="product-image">` : 'Нет'}</td>
+                                <td>${promo.category_name || 'Без категории'}</td>
+                                <td>${new Date(promo.start_date).toLocaleDateString()}</td>
+                                <td>${new Date(promo.end_date).toLocaleDateString()}</td>
+                                <td>${promo.status}</td>
+                                <td>
+                                    <button onclick='editPromotion(${JSON.stringify(promo)})'>Редактировать</button>
+                                    <button onclick="deletePromotion(${promo.promotion_id})">Удалить</button>
+                                </td>
+                            `;
+                            promotionsTbody.appendChild(row);
+                        });
+                    }
+                    break;
             }
+        } else {
+            alert(data.message);
         }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при загрузке данных');
+    }
+}
 
-        async function populateCategorySelect(select, selectedId) {
-            try {
-                const response = await fetch(`${API_URL}?action=get_categories`, {
-                    credentials: 'include'
+        async function populateCategorySelect(select, selectedId = '') {
+            const response = await fetch(`${API_URL}?action=get_categories`, { credentials: 'include' });
+            const data = await response.json();
+            if (data.status === 'success') {
+                select.innerHTML = '<option value="">Без категории</option>';
+                data.data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.category_id;
+                    option.textContent = category.name + (category.parent_name ? ` (${category.parent_name})` : '');
+                    if (category.category_id == selectedId) option.selected = true;
+                    select.appendChild(option);
                 });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    select.innerHTML = '<option value="">Выберите категорию</option>';
-                    data.data.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category.category_id;
-                        option.textContent = category.name + (category.parent_name ? ` (${category.parent_name})` : '');
-                        if (category.category_id == selectedId) {
-                            option.selected = true;
-                        }
-                        select.appendChild(option);
-                    });
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при загрузке категорий');
+            } else {
+                alert(data.message);
             }
         }
 
         async function populateRoleSelect(select, selectedId) {
-            try {
-                const response = await fetch(`${API_URL}?action=get_roles`, {
-                    credentials: 'include'
+            const response = await fetch(`${API_URL}?action=get_roles`, { credentials: 'include' });
+            const data = await response.json();
+            if (data.status === 'success') {
+                select.innerHTML = '';
+                data.data.forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role.id;
+                    option.textContent = role.name;
+                    if (role.id == selectedId) option.selected = true;
+                    select.appendChild(option);
                 });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    select.innerHTML = '';
-                    data.data.forEach(role => {
-                        const option = document.createElement('option');
-                        option.value = role.id;
-                        option.textContent = role.name;
-                        if (role.id == selectedId) {
-                            option.selected = true;
-                        }
-                        select.appendChild(option);
-                    });
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при загрузке ролей');
+            } else {
+                alert(data.message);
             }
         }
 
         async function loadCharacteristics(categoryId, productId = null) {
             const container = productId ? document.getElementById('edit-characteristics-container') : document.getElementById('characteristics-container');
             container.innerHTML = '';
-
             if (!categoryId) return;
-
-            try {
-                const response = await fetch(`${API_URL}?action=get_characteristics&category_id=${categoryId}`, {
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    let existingCharacteristics = {};
-                    if (productId) {
-                        const productResponse = await fetch(`${API_URL}?action=get_product_characteristics&product_id=${productId}`, {
-                            credentials: 'include'
-                        });
-                        const productData = await productResponse.json();
-                        if (productData.status === 'success') {
-                            productData.data.forEach(char => {
-                                existingCharacteristics[char.characteristic_id] = char.value;
-                            });
-                        }
+            const response = await fetch(`${API_URL}?action=get_characteristics&category_id=${categoryId}`, { credentials: 'include' });
+            const data = await response.json();
+            if (data.status === 'success') {
+                let existingCharacteristics = {};
+                if (productId) {
+                    const productResponse = await fetch(`${API_URL}?action=get_product_characteristics&product_id=${productId}`, { credentials: 'include' });
+                    const productData = await productResponse.json();
+                    if (productData.status === 'success') {
+                        productData.data.forEach(char => existingCharacteristics[char.characteristic_id] = char.value);
                     }
-
-                    data.data.forEach(char => {
-                        const value = existingCharacteristics[char.characteristic_id] || '';
-                        const div = document.createElement('div');
-                        const inputType = char.value_type === 'Число' ? 'number' : 'text';
-                        div.innerHTML = `
-                            <label>${char.name} (${char.value_type}):</label>
-                            <input type="${inputType}" name="characteristic_${char.characteristic_id}" value="${value}">
-                        `;
-                        container.appendChild(div);
-                    });
-                } else {
-                    alert(data.message);
                 }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при загрузке характеристик');
+                data.data.forEach(char => {
+                    const value = existingCharacteristics[char.characteristic_id] || '';
+                    const div = document.createElement('div');
+                    const inputType = char.value_type === 'Число' ? 'number' : 'text';
+                    div.innerHTML = `
+                        <label>${char.name} (${char.value_type}):</label>
+                        <input type="${inputType}" name="characteristic_${char.characteristic_id}" value="${value}">
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                alert(data.message);
             }
         }
 
-        function validateAddProductForm(form) {
+        // Валидация форм
+        function validateProductForm(form, prefix) {
             let isValid = true;
             const name = form.name.value.trim();
             const price = form.price.value;
             const stock = form.stock_quantity.value;
             const discount = form.discount.value;
 
-            // Сброс ошибок
-            document.getElementById('add-product-name-error').style.display = 'none';
-            document.getElementById('add-product-price-error').style.display = 'none';
-            document.getElementById('add-product-stock-error').style.display = 'none';
-            document.getElementById('add-product-discount-error').style.display = 'none';
+            document.getElementById(`${prefix}-name-error`).style.display = 'none';
+            document.getElementById(`${prefix}-price-error`).style.display = 'none';
+            document.getElementById(`${prefix}-stock-error`).style.display = 'none';
 
             if (!name) {
-                document.getElementById('add-product-name-error').style.display = 'block';
+                document.getElementById(`${prefix}-name-error`).style.display = 'block';
                 isValid = false;
             }
             if (price < 0 || price === '') {
-                document.getElementById('add-product-price-error').style.display = 'block';
+                document.getElementById(`${prefix}-price-error`).style.display = 'block';
                 isValid = false;
             }
             if (stock < 0 || stock === '') {
-                document.getElementById('add-product-stock-error').style.display = 'block';
+                document.getElementById(`${prefix}-stock-error`).style.display = 'block';
                 isValid = false;
             }
-            if (discount !== '' && (discount < 0 || discount > 100)) {
-                document.getElementById('add-product-discount-error').style.display = 'block';
-                isValid = false;
-            }
-
             return isValid;
         }
 
-        function validateEditProductForm(form) {
-            let isValid = true;
-            const name = form.name.value.trim();
-            const price = form.price.value;
-            const stock = form.stock_quantity.value;
-            const discount = form.discount.value;
-
-            // Сброс ошибок
-            document.getElementById('edit-product-name-error').style.display = 'none';
-            document.getElementById('edit-product-price-error').style.display = 'none';
-            document.getElementById('edit-product-stock-error').style.display = 'none';
-            document.getElementById('edit-product-discount-error').style.display = 'none';
-
-            if (!name) {
-                document.getElementById('edit-product-name-error').style.display = 'block';
-                isValid = false;
-            }
-            if (price < 0 || price === '') {
-                document.getElementById('edit-product-price-error').style.display = 'block';
-                isValid = false;
-            }
-            if (stock < 0 || stock === '') {
-                document.getElementById('edit-product-stock-error').style.display = 'block';
-                isValid = false;
-            }
-            if (discount !== '' && (discount < 0 || discount > 100)) {
-                document.getElementById('edit-product-discount-error').style.display = 'block';
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        function validateEditUserForm(form) {
+        function validateUserForm(form) {
             let isValid = true;
             const name = form.name.value.trim();
             const email = form.email.value.trim();
             const role = form.role_id.value;
 
-            // Сброс ошибок
             document.getElementById('edit-user-name-error').style.display = 'none';
             document.getElementById('edit-user-email-error').style.display = 'none';
             document.getElementById('edit-user-role-error').style.display = 'none';
@@ -714,57 +976,28 @@
                 document.getElementById('edit-user-role-error').style.display = 'block';
                 isValid = false;
             }
-
             return isValid;
         }
 
-        function validateEditOrderForm(form) {
-            let isValid = true;
-            const status = form.order_status.value;
-
-            // Сброс ошибок
-            document.getElementById('edit-order-status-error').style.display = 'none';
-
-            if (!status) {
-                document.getElementById('edit-order-status-error').style.display = 'block';
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
+        // Продукты
         function openAddProductModal() {
             const modal = document.getElementById('add-product-modal');
             const form = document.getElementById('add-product-form');
             form.reset();
-
-            const categorySelect = form.querySelector('select[name="category_id"]');
-            populateCategorySelect(categorySelect, '');
-
+            populateCategorySelect(form.querySelector('select[name="category_id"]'));
             modal.style.display = 'flex';
-
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                if (!validateAddProductForm(form)) return;
-
+                if (!validateProductForm(form, 'add-product')) return;
                 const formData = new FormData(form);
                 formData.append('action', 'add_product');
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'include'
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        closeModal('add-product-modal');
-                        loadData('products', document.getElementById('product-search').value);
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    alert('Произошла ошибка при добавлении продукта');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('add-product-modal');
+                    loadData('products');
+                } else {
+                    alert(data.message);
                 }
             };
         }
@@ -777,70 +1010,44 @@
             form.description.value = product.description || '';
             form.price.value = product.price;
             form.stock_quantity.value = product.stock_quantity;
-            form.discount.value = product.discount;
+            form.discount.value = product.discount || '';
             form.is_bestseller.checked = product.is_bestseller;
             form.is_new.checked = product.is_new;
-
             const currentImageDiv = document.getElementById('current-image');
-            if (product.image_url) {
-                currentImageDiv.innerHTML = `<p>Текущее изображение: <img src="${product.image_url}" alt="Product Image" style="max-width: 100px;"></p>`;
-            } else {
-                currentImageDiv.innerHTML = '<p>Изображение отсутствует</p>';
-            }
-
-            const categorySelect = form.querySelector('select[name="category_id"]');
-            populateCategorySelect(categorySelect, product.category_id);
+            currentImageDiv.innerHTML = product.image_url ? `<img src="/brow12/${product.image_url}" alt="Current Image" style="max-width: 100px;">` : 'Нет изображения';
+            populateCategorySelect(form.querySelector('select[name="category_id"]'), product.category_id);
             loadCharacteristics(product.category_id, product.product_id);
-
             modal.style.display = 'flex';
-
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                if (!validateEditProductForm(form)) return;
-
+                if (!validateProductForm(form, 'edit-product')) return;
                 const formData = new FormData(form);
                 formData.append('action', 'edit_product');
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'include'
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        closeModal('edit-product-modal');
-                        loadData('products', document.getElementById('product-search').value);
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    alert('Произошла ошибка при редактировании продукта');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-product-modal');
+                    loadData('products');
+                } else {
+                    alert(data.message);
                 }
             };
         }
 
         async function deleteProduct(productId) {
             if (!confirm('Вы уверены, что хотите удалить этот продукт?')) return;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=delete_product&product_id=${productId}`,
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    loadData('products', document.getElementById('product-search').value);
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при удалении продукта');
-            }
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_product&product_id=${productId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('products');
+            else alert(data.message);
         }
 
+        // Пользователи
         function editUser(user) {
             const modal = document.getElementById('edit-user-modal');
             const form = document.getElementById('edit-user-form');
@@ -851,120 +1058,308 @@
             form.postal_code.value = user.postal_code || '';
             form.preferred_payment_method.value = user.preferred_payment_method || '';
             form.preferred_delivery_method.value = user.preferred_delivery_method || '';
-
-            const roleSelect = form.querySelector('select[name="role_id"]');
-            populateRoleSelect(roleSelect, user.role_id);
-
+            populateRoleSelect(form.querySelector('select[name="role_id"]'), user.role_id);
             modal.style.display = 'flex';
-
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                if (!validateEditUserForm(form)) return;
-
+                if (!validateUserForm(form)) return;
                 const formData = new FormData(form);
                 formData.append('action', 'edit_user');
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'include'
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        closeModal('edit-user-modal');
-                        loadData('users', document.getElementById('user-search').value);
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    alert('Произошла ошибка при редактировании пользователя');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-user-modal');
+                    loadData('users');
+                } else {
+                    alert(data.message);
                 }
             };
         }
 
         async function deleteUser(userId) {
             if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) return;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=delete_user&user_id=${userId}`,
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    loadData('users', document.getElementById('user-search').value);
-                } else {
-                    alert(data.message);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при удалении пользователя');
-            }
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_user&user_id=${userId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('users');
+            else alert(data.message);
         }
 
+        // Заказы
         function editOrder(order) {
             const modal = document.getElementById('edit-order-modal');
             const form = document.getElementById('edit-order-form');
             form.order_id.value = order.order_id;
             form.order_status.value = order.order_status;
-        
             form.delivery_address.value = order.delivery_address;
-
             const itemsDiv = document.getElementById('order-items');
-            itemsDiv.innerHTML = '<h4>Товары в заказе:</h4>';
-            order.items.forEach(item => {
-                itemsDiv.innerHTML += `<p>${item.product_name} - ${item.quantity} шт. по ${item.price_per_item} руб.</p>`;
-            });
-
+            itemsDiv.innerHTML = '<h4>Товары:</h4>' + order.items.map(item => `<p>${item.product_name} - ${item.quantity} шт. по ${item.price_per_item} руб.</p>`).join('');
             modal.style.display = 'flex';
-
             form.onsubmit = async (e) => {
                 e.preventDefault();
-                if (!validateEditOrderForm(form)) return;
-
                 const formData = new FormData(form);
                 formData.append('action', 'edit_order');
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'include'
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        closeModal('edit-order-modal');
-                        loadData('orders', document.getElementById('order-search').value);
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    alert('Произошла ошибка при редактировании заказа');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-order-modal');
+                    loadData('orders');
+                } else {
+                    alert(data.message);
                 }
             };
         }
 
         async function deleteOrder(orderId) {
             if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=delete_order&order_id=${orderId}`,
-                    credentials: 'include'
-                });
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_order&order_id=${orderId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('orders');
+            else alert(data.message);
+        }
+
+        // Категории
+        function openAddCategoryModal() {
+            const modal = document.getElementById('add-category-modal');
+            const form = document.getElementById('add-category-form');
+            form.reset();
+            populateCategorySelect(form.querySelector('select[name="parent_category_id"]'));
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'add_category');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
                 const data = await response.json();
                 if (data.status === 'success') {
-                    loadData('orders', document.getElementById('order-search').value);
+                    closeModal('add-category-modal');
+                    loadData('categories');
                 } else {
                     alert(data.message);
                 }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при удалении заказа');
-            }
+            };
+        }
+
+        function editCategory(category) {
+            const modal = document.getElementById('edit-category-modal');
+            const form = document.getElementById('edit-category-form');
+            form.category_id.value = category.category_id;
+            form.name.value = category.name;
+            populateCategorySelect(form.querySelector('select[name="parent_category_id"]'), category.parent_category_id);
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'edit_category');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-category-modal');
+                    loadData('categories');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        async function deleteCategory(categoryId) {
+            if (!confirm('Вы уверены, что хотите удалить эту категорию?')) return;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_category&category_id=${categoryId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('categories');
+            else alert(data.message);
+        }
+
+        // Характеристики
+        function openAddCharacteristicModal() {
+            const modal = document.getElementById('add-characteristic-modal');
+            const form = document.getElementById('add-characteristic-form');
+            form.reset();
+            populateCategorySelect(form.querySelector('select[name="category_id"]'));
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'add_characteristic');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('add-characteristic-modal');
+                    loadData('characteristics');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        function editCharacteristic(char) {
+            const modal = document.getElementById('edit-characteristic-modal');
+            const form = document.getElementById('edit-characteristic-form');
+            form.characteristic_id.value = char.characteristic_id;
+            form.name.value = char.name;
+            form.value_type.value = char.value_type;
+            populateCategorySelect(form.querySelector('select[name="category_id"]'), char.category_id);
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'edit_characteristic');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-characteristic-modal');
+                    loadData('characteristics');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        async function deleteCharacteristic(charId) {
+            if (!confirm('Вы уверены, что хотите удалить эту характеристику?')) return;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_characteristic&characteristic_id=${charId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('characteristics');
+            else alert(data.message);
+        }
+
+        // Новости
+        function openAddNewsModal() {
+            const modal = document.getElementById('add-news-modal');
+            const form = document.getElementById('add-news-form');
+            form.reset();
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'add_news');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('add-news-modal');
+                    loadData('news');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        function editNews(news) {
+            const modal = document.getElementById('edit-news-modal');
+            const form = document.getElementById('edit-news-form');
+            form.news_id.value = news.news_id;
+            form.title.value = news.title;
+            form.content.value = news.content;
+            const currentImageDiv = document.getElementById('current-news-image');
+            currentImageDiv.innerHTML = news.image_url ? `<img src="/brow12/${news.image_url}" alt="Current Image" style="max-width: 100px;">` : 'Нет изображения';
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'edit_news');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-news-modal');
+                    loadData('news');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        async function deleteNews(newsId) {
+            if (!confirm('Вы уверены, что хотите удалить эту новость?')) return;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_news&news_id=${newsId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('news');
+            else alert(data.message);
+        }
+
+        // Акции
+        function openAddPromotionModal() {
+            const modal = document.getElementById('add-promotion-modal');
+            const form = document.getElementById('add-promotion-form');
+            form.reset();
+            populateCategorySelect(form.querySelector('select[name="category_id"]'));
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'add_promotion');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('add-promotion-modal');
+                    loadData('promotions');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        function editPromotion(promo) {
+            const modal = document.getElementById('edit-promotion-modal');
+            const form = document.getElementById('edit-promotion-form');
+            form.promotion_id.value = promo.promotion_id;
+            form.title.value = promo.title;
+            form.description.value = promo.description || '';
+            form.start_date.value = promo.start_date.split(' ')[0];
+            form.end_date.value = promo.end_date.split(' ')[0];
+            populateCategorySelect(form.querySelector('select[name="category_id"]'), promo.category_id);
+            const currentImageDiv = document.getElementById('current-promotion-image');
+            currentImageDiv.innerHTML = promo.image_url ? `<img src="/brow12/${promo.image_url}" alt="Current Image" style="max-width: 100px;">` : 'Нет изображения';
+            modal.style.display = 'flex';
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                formData.append('action', 'edit_promotion');
+                const response = await fetch(API_URL, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    closeModal('edit-promotion-modal');
+                    loadData('promotions');
+                } else {
+                    alert(data.message);
+                }
+            };
+        }
+
+        async function deletePromotion(promoId) {
+            if (!confirm('Вы уверены, что хотите удалить эту акцию?')) return;
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=delete_promotion&promotion_id=${promoId}`,
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (data.status === 'success') loadData('promotions');
+            else alert(data.message);
         }
 
         function closeModal(modalId) {

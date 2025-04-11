@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="status no-status"></div>
                 `}
                 
-                <img src="${product.image_url}" 
+                <img src="../${product.image_url}" 
                      class="product-image" 
                      alt="${product.name}"
                      onerror="this.src=''">
