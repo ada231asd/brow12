@@ -310,10 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (products.length === 0 && currentFilters.searchQuery) {
             container.style.display = 'none';
             noResultsBlock.style.display = 'flex';
-        } else {
-            container.style.display = 'grid';
-            noResultsBlock.style.display = 'none';
-        }
+        } 
 
         // Рендер карточек товаров
         const renderStars = (rating) => {
