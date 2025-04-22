@@ -46,7 +46,7 @@ header {
 
 .hed_top {
   display: flex;
-  height: 65xp;
+  height: 65px;
 }
 .hed_top .logo {
   cursor: pointer;

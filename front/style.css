@@ -1,0 +1,256 @@
+@charset "UTF-8";
+@import url("https://db.onlinewebfonts.com/c/789880527b3261751934cac453199c75?family=SPACE+ARMOR");
+@import url("https://fontlibrary.org//face/exo-2");
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: violet;
+  border-radius: 4px;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: violet #141414;
+}
+
+body {
+  background-color: #141414;
+  display: flex;
+  overflow-x: hidden;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, p {
+  color: white;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1 {
+  font-family: "Exo 2", sans-serif;
+  font-size: 30px;
+  margin-left: 186px;
+  margin-top: 78px;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 640px);
+  gap: 20px;
+  justify-content: center;
+  padding: 30px 0;
+  margin: 0 auto;
+}
+
+.news-card {
+  background-color: #1E1E1E;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+  height: 239px;
+  display: flex;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.news-image {
+  margin-top: 30px;
+  margin-left: 30px;
+  width: 150px;
+  height: 179px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  background: #f5f5f5;
+}
+
+.news-content {
+  display: flex;
+  margin-left: 20px;
+  margin-top: 30px;
+  flex-direction: column;
+  max-width: 410px;
+}
+.news-content .news-title {
+  font-family: "Exo 2", sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  max-width: 440px;
+  max-height: 34px;
+}
+.news-content .new-cont {
+  margin-top: 20px;
+  font-family: "Exo 2", sans-serif;
+  font-size: 16px;
+  max-height: 76px;
+  color: white;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Кол-во строк */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-content .down-new-cont {
+  color: white;
+  font-family: "Exo 2", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  gap: 192px;
+  margin-top: 30px;
+}
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1E1E1E;
+  padding: 25px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1250px;
+  z-index: 1000;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+}
+
+.blok_mod {
+  display: flex;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.blok_mod .modal_cont {
+  display: flex;
+  flex-direction: column;
+}
+.blok_mod .modal_cont h2 {
+  font-family: "Exo 2", sans-serif;
+  font-size: 36px;
+  font-weight: bold;
+}
+.blok_mod .modal_cont p {
+  font-family: "Exo 2", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  max-width: 750px;
+}
+.blok_mod img {
+  width: 530px;
+  height: 750px;
+}
+
+.modal button {
+  margin-top: 15px;
+  padding: 8px 20px;
+  background: #AE00FF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Exo 2", sans-serif;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.modal button:hover {
+  background: #9000FF;
+}
+
+@media (max-width: 768px) {
+  .news-grid {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  h1 {
+    margin-left: 20px;
+    font-size: 24px;
+  }
+}
+.promotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  padding: 40px 5%;
+}
+
+.promotion-card {
+  background-color: #1E1E1E;
+  border: 1px solid #2A2A2A;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promotion-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.promotion-image {
+  width: 100%;
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  background-color: #2c2c2c;
+}
+
+.promotion-content {
+  padding: 16px;
+}
+
+.promotion-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #EAEAEA;
+  margin-bottom: 8px;
+}
+
+.promotion-dates {
+  font-size: 0.9em;
+  color: #A0A0A0;
+  margin-bottom: 10px;
+}
+
+.promotion-category {
+  display: inline-block;
+  background: #7A1FA1;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  margin-bottom: 10px;
+}
+
+.promotion-content p {
+  font-size: 0.95em;
+  line-height: 1.5;
+  color: #CFCFCF;
+}/*# sourceMappingURL=style.css.map */

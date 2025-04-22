@@ -668,35 +668,6 @@ h3 {
   display: flex;
 }
 
-/* Стили для счетчика сравнения */
-#comparison-counter {
-  display: none;
-  z-index: 1;
-  margin-top: -15px;
-  margin-left: -4px;
-  background-color: #8A33FD;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  text-align: center;
-  line-height: 18px;
-}
-
-/* Стили для кнопки корзины */
-.btn-cart {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background-color: #8A33FD;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .btn-cart:hover {
   background-color: #7A2BE8;
 }
@@ -708,22 +679,6 @@ h3 {
 
 .btn-cart svg path {
   fill: white;
-}
-
-/* Стили для счетчика корзины */
-#cart-counter {
-  display: none;
-  z-index: 1;
-  margin-top: -15px;
-  margin-left: -4px;
-  background-color: #FF3D00;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  text-align: center;
-  line-height: 18px;
 }
 
 .btn-cart.animate {

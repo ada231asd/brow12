@@ -128,117 +128,115 @@
 }
 
 
-        // Функция рендеринга товаров
-        function renderProducts(products, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Очистка контейнера перед добавлением новых товаров
+function renderProducts(products, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = ''; // Очистка контейнера перед добавлением новых товаров
 
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.addEventListener('click', (e) => {
-                    if (!e.target.closest('.btn')) {
-                        window.location.href = `product.html?id=${product.product_id}`;
-                    }
-                });
-
-                // Статус товара
-                if (product.is_bestseller || product.is_new) {
-                    const status = document.createElement('div');
-                    status.className = `status ${product.is_bestseller ? 'hit' : 'new'}`;
-                    status.textContent = product.is_bestseller ? 'Хит продаж' : 'Новинка';
-                    card.appendChild(status);
+    products.forEach(product => {
+        // Показываем только товары с ненулевой скидкой
+        if (product.discount > 0) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.btn')) {
+                    window.location.href = `product.html?id=${product.product_id}`;
                 }
-
-                // Изображение
-                const img = document.createElement('img');
-                img.className = 'product-image';
-                img.src = product.image_url;
-                img.alt = product.product_name;
-                card.appendChild(img);
-
-                // Категория и название
-                const category = document.createElement('p');
-                category.textContent = product.category_name;
-                category.className = 'product-category';
-                card.appendChild(category);
-
-                const name = document.createElement('h3');
-                name.textContent = product.product_name;
-                card.appendChild(name);
-
-                // Рейтинг и отзывы
-                const ratingReviews = document.createElement('div');
-                ratingReviews.className = 'rating-reviews';
-
-                const rating = document.createElement('span');
-                rating.className = 'rating';
-                rating.innerHTML = '★'.repeat(product.average_rating) + '☆'.repeat(5 - product.average_rating);
-
-                const reviewBlock = document.createElement('span');
-                reviewBlock.className = 'review-block';
-                reviewBlock.innerHTML = `
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span class="reviews">(${product.reviews_count})</span>
-                `;
-
-                ratingReviews.append(rating, reviewBlock);
-                card.appendChild(ratingReviews);
-
-                // Цена
-                const priceContainer = document.createElement('div');
-                priceContainer.className = 'price';
-
-                if (product.discount > 0) {
-                    const oldPrice = document.createElement('span');
-                    oldPrice.style.textDecoration = 'line-through';
-                    oldPrice.textContent = `${product.price.toLocaleString('ru-RU')} ₽`;
-
-                    const discountAmount = Math.round(product.price - product.final_price);
-                    const discountPercent = Math.round(product.discount);
-                    const discount = document.createElement('span');
-                    discount.className = 'discount-badge';
-                    discount.innerHTML = `
-                        <span class="disk_is">-${discountPercent}%</span>
-                        <span class="discount-amount">(-${discountAmount.toLocaleString('ru-RU')} ₽)</span>
-                    `;
-
-                    const newPrice = document.createElement('div');
-                    newPrice.textContent = `${product.final_price.toLocaleString('ru-RU')} ₽`;
-
-                    priceContainer.append(oldPrice, newPrice, discount);
-                } else {
-                    priceContainer.textContent = `${product.price.toLocaleString('ru-RU')} ₽`;
-                }
-                card.appendChild(priceContainer);
-
-                // Кнопки
-                const actions = document.createElement('div');
-                actions.className = 'actions';
-
-                const buyBtn = document.createElement('div');
-                buyBtn.className = 'btn-buy';
-                buyBtn.textContent = 'Купить в 1 клик';
-
-                const cartBtn = document.createElement('div');
-                cartBtn.className = 'btn-cart';
-                cartBtn.innerHTML = `
-                    <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7.38164 19.7034C8.20955 19.7034 8.88071 19.0394 8.88071 18.2203C8.88071 17.4011 8.20955 16.7371 7.38164 16.7371C6.55372 16.7371 5.88257 17.4011 5.88257 18.2203C5.88257 19.0394 6.55372 19.7034 7.38164 19.7034Z" fill="white"/>
-                        <path d="M16.4893 19.7034C17.3173 19.7034 17.9884 19.0394 17.9884 18.2203C17.9884 17.4011 17.3173 16.7371 16.4893 16.7371C15.6614 16.7371 14.9903 17.4011 14.9903 18.2203C14.9903 19.0394 15.6614 19.7034 16.4893 19.7034Z" fill="white"/>
-                        <path d="M20.5402 2.13853C20.4782 2.06292 20.4 2.00183 20.3113 1.95966C20.2226 1.91749 20.1256 1.89529 20.0272 1.89464H9.06608C8.61737 1.89464 8.2998 2.33323 8.43984 2.75953C8.52872 3.03009 8.7813 3.21298 9.06608 3.21298H19.1544L17.3755 10.1455H7.38164L4.33685 1.58484C4.30392 1.48363 4.24673 1.3918 4.17016 1.31719C4.09359 1.24259 3.99992 1.18741 3.89713 1.15638L1.16548 0.325828C1.08149 0.300292 0.993233 0.291373 0.905756 0.299582C0.818278 0.307791 0.733291 0.332967 0.655647 0.373671C0.498839 0.455877 0.38146 0.596345 0.329333 0.764174C0.277206 0.932002 0.294601 1.11344 0.377691 1.26858C0.46078 1.42372 0.602759 1.53985 0.772393 1.59143L3.16425 2.31651L6.22236 10.8969L5.1297 11.7802L5.04308 11.8659C4.77281 12.174 4.61961 12.5658 4.60988 12.9737C4.60016 13.3816 4.7345 13.78 4.98978 14.1005C5.17138 14.319 5.40213 14.4924 5.66359 14.6068C5.92505 14.7213 6.20996 14.7736 6.49552 14.7596H17.6153C17.792 14.7596 17.9615 14.6902 18.0864 14.5666C18.2114 14.4429 18.2816 14.2753 18.2816 14.1005C18.2816 13.9256 18.2114 13.758 18.0864 13.6344C17.9615 13.5107 17.792 13.4413 17.6153 13.4413H6.38892C6.3122 13.4387 6.23745 13.4166 6.17189 13.3771C6.10634 13.3375 6.05219 13.282 6.01468 13.2157C5.97717 13.1494 5.95757 13.0747 5.95777 12.9988C5.95797 12.9228 5.97796 12.8482 6.01582 12.7821L7.62149 11.4638H17.9085C18.0625 11.4675 18.213 11.4183 18.3345 11.3246C18.456 11.2308 18.5409 11.0983 18.5747 10.9497L20.6867 2.69883C20.707 2.60056 20.7043 2.49901 20.6789 2.40191C20.6535 2.30482 20.6061 2.21474 20.5402 2.13853Z" fill="white"/>
-                    </svg>
-                `;
-
-                actions.append(buyBtn, cartBtn);
-                card.appendChild(actions);
-
-                // Добавляем карточку в контейнер
-                container.appendChild(card);
             });
+
+            // Статус товара
+            if (product.is_bestseller || product.is_new) {
+                const status = document.createElement('div');
+                status.className = `status ${product.is_bestseller ? 'hit' : 'new'}`;
+                status.textContent = product.is_bestseller ? 'Хит продаж' : 'Новинка';
+                card.appendChild(status);
+            }
+
+            // Изображение
+            const img = document.createElement('img');
+            img.className = 'product-image';
+            img.src = product.image_url;
+            img.alt = product.product_name;
+            card.appendChild(img);
+
+            // Категория и название
+            const category = document.createElement('p');
+            category.textContent = product.category_name;
+            category.className = 'product-category';
+            card.appendChild(category);
+
+            const name = document.createElement('h3');
+            name.textContent = product.product_name;
+            card.appendChild(name);
+
+            // Рейтинг и отзывы
+            const ratingReviews = document.createElement('div');
+            ratingReviews.className = 'rating-reviews';
+
+            const rating = document.createElement('span');
+            rating.className = 'rating';
+            rating.innerHTML = '★'.repeat(product.average_rating) + '☆'.repeat(5 - product.average_rating);
+
+            const reviewBlock = document.createElement('span');
+            reviewBlock.className = 'review-block';
+            reviewBlock.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="reviews">(${product.reviews_count})</span>
+            `;
+
+            ratingReviews.append(rating, reviewBlock);
+            card.appendChild(ratingReviews);
+
+            // Цена
+            const priceContainer = document.createElement('div');
+            priceContainer.className = 'price';
+
+            const oldPrice = document.createElement('span');
+            oldPrice.style.textDecoration = 'line-through';
+            oldPrice.textContent = `${product.price.toLocaleString('ru-RU')} ₽`;
+
+            const discountAmount = Math.round(product.price - product.final_price);
+            const discountPercent = Math.round(product.discount);
+            const discount = document.createElement('span');
+            discount.className = 'discount-badge';
+            discount.innerHTML = `
+                <span class="disk_is">-${discountPercent}%</span>
+                <span class="discount-amount">(-${discountAmount.toLocaleString('ru-RU')} ₽)</span>
+            `;
+
+            const newPrice = document.createElement('div');
+            newPrice.textContent = `${product.final_price.toLocaleString('ru-RU')} ₽`;
+
+            priceContainer.append(oldPrice, newPrice, discount);
+            card.appendChild(priceContainer);
+
+            // Кнопки
+            const actions = document.createElement('div');
+            actions.className = 'actions';
+
+            const buyBtn = document.createElement('div');
+            buyBtn.className = 'btn-buy';
+            buyBtn.textContent = 'Купить в 1 клик';
+
+            const cartBtn = document.createElement('div');
+            cartBtn.className = 'btn-cart';
+            cartBtn.innerHTML = `
+                <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.38164 19.7034C8.20955 19.7034 8.88071 19.0394 8.88071 18.2203C8.88071 17.4011 8.20955 16.7371 7.38164 16.7371C6.55372 16.7371 5.88257 17.4011 5.88257 18.2203C5.88257 19.0394 6.55372 19.7034 7.38164 19.7034Z" fill="white"/>
+                    <path d="M16.4893 19.7034C17.3173 19.7034 17.9884 19.0394 17.9884 18.2203C17.9884 17.4011 17.3173 16.7371 16.4893 16.7371C15.6614 16.7371 14.9903 17.4011 14.9903 18.2203C14.9903 19.0394 15.6614 19.7034 16.4893 19.7034Z" fill="white"/>
+                    <path d="M20.5402 2.13853C20.4782 2.06292 20.4 2.00183 20.3113 1.95966C20.2226 1.91749 20.1256 1.89529 20.0272 1.89464H9.06608C8.61737 1.89464 8.2998 2.33323 8.43984 2.75953C8.52872 3.03009 8.7813 3.21298 9.06608 3.21298H19.1544L17.3755 10.1455H7.38164L4.33685 1.58484C4.30392 1.48363 4.24673 1.3918 4.17016 1.31719C4.09359 1.24259 3.99992 1.18741 3.89713 1.15638L1.16548 0.325828C1.08149 0.300292 0.993233 0.291373 0.905756 0.299582C0.818278 0.307791 0.733291 0.332967 0.655647 0.373671C0.498839 0.455877 0.38146 0.596345 0.329333 0.764174C0.277206 0.932002 0.294601 1.11344 0.377691 1.26858C0.46078 1.42372 0.602759 1.53985 0.772393 1.59143L3.16425 2.31651L6.22236 10.8969L5.1297 11.7802L5.04308 11.8659C4.77281 12.174 4.61961 12.5658 4.60988 12.9737C4.60016 13.3816 4.7345 13.78 4.98978 14.1005C5.17138 14.319 5.40213 14.4924 5.66359 14.6068C5.92505 14.7213 6.20996 14.7736 6.49552 14.7596H17.6153C17.792 14.7596 17.9615 14.6902 18.0864 14.5666C18.2114 14.4429 18.2816 14.2753 18.2816 14.1005C18.2816 13.9256 18.2114 13.758 18.0864 13.6344C17.9615 13.5107 17.792 13.4413 17.6153 13.4413H6.38892C6.3122 13.4387 6.23745 13.4166 6.17189 13.3771C6.10634 13.3375 6.05219 13.282 6.01468 13.2157C5.97717 13.1494 5.95757 13.0747 5.95777 12.9988C5.95797 12.9228 5.97796 12.8482 6.01582 12.7821L7.62149 11.4638H17.9085C18.0625 11.4675 18.213 11.4183 18.3345 11.3246C18.456 11.2308 18.5409 11.0983 18.5747 10.9497L20.6867 2.69883C20.707 2.60056 20.7043 2.49901 20.6789 2.40191C20.6535 2.30482 20.6061 2.21474 20.5402 2.13853Z" fill="white"/>
+                </svg>
+            `;
+
+            actions.append(buyBtn, cartBtn);
+            card.appendChild(actions);
+
+            // Добавляем карточку в контейнер
+            container.appendChild(card);
         }
+    });
+}
 
         window.addEventListener('DOMContentLoaded', () => {
     // Хиты продаж (только из категорий 1 и 5)

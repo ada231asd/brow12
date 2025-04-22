@@ -10,10 +10,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="user-menu" style="display: none;">
-    <img class="user-avatar" alt="Аватар">
-    <span class="user-name"></span>
-  </div>
 <?php require '../Header/header.html'; ?>
 <div class="catalog">
     <div class="filter_cont">
@@ -73,7 +69,7 @@
 
 
 
-<!-- <?php require '../Foter/foter.html';?> -->
+<?php require '../Foter/foter.html';?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
 <script src="js/script.js"></script>
 </body>
