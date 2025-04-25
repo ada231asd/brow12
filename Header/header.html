@@ -102,8 +102,9 @@
     </header>
     <script>
         function redirectToHome() {
-        window.location.href = '/brow12/index.php';
-    }
+            window.location.href = '/brow12/index.php';
+        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             async function fetchUserData() {
                 try {
@@ -111,9 +112,9 @@
                         method: 'GET',
                         credentials: 'include'
                     });
-
+        
                     const data = await response.json();
-
+        
                     if (data.status === 'success') {
                         updateHeader(data.data);
                     } else {
@@ -124,20 +125,20 @@
                     resetHeader();
                 }
             }
-
+        
             function updateHeader(userData) {
                 // Счетчик корзины (сумма quantity)
                 const cartCounter = document.getElementById('cart-counter');
                 const cartTotalQuantity = userData.cart.reduce((sum, item) => sum + item.quantity, 0);
                 cartCounter.textContent = cartTotalQuantity;
                 cartCounter.style.display = cartTotalQuantity > 0 ? 'inline-block' : 'none';
-
+        
                 // Счетчик сравнения (количество записей)
                 const comparisonCounter = document.getElementById('comparison-counter');
                 const comparisonItems = userData.comparisons.length;
                 comparisonCounter.textContent = comparisonItems;
                 comparisonCounter.style.display = comparisonItems > 0 ? 'inline-block' : 'none';
-
+        
                 // Фото профиля
                 const profileIcon = document.getElementById('profile-icon');
                 if (userData.user.photo && userData.user.photo !== '') {
@@ -145,21 +146,34 @@
                 } else {
                     profileIcon.src = '/../brow12/img/profil.svg';
                 }
-
+        
                 // Индикатор авторизации
                 const authIndicator = document.getElementById('auth-indicator');
                 authIndicator.style.display = 'block';
             }
-
+        
             function resetHeader() {
                 document.getElementById('cart-counter').style.display = 'none';
                 document.getElementById('comparison-counter').style.display = 'none';
                 document.getElementById('profile-icon').src = '/../brow12/img/profil.svg';
                 document.getElementById('auth-indicator').style.display = 'none';
             }
-
+        
+            // Подписка на событие обновления счетчиков
+            window.addEventListener('updateCounters', (event) => {
+                const { cartCount, comparisonCount } = event.detail;
+        
+                const cartCounter = document.getElementById('cart-counter');
+                cartCounter.textContent = cartCount;
+                cartCounter.style.display = cartCount > 0 ? 'inline-block' : 'none';
+        
+                const comparisonCounter = document.getElementById('comparison-counter');
+                comparisonCounter.textContent = comparisonCount;
+                comparisonCounter.style.display = comparisonCount > 0 ? 'inline-block' : 'none';
+            });
+        
             fetchUserData();
         });
-    </script>
+        </script>
 </body>
 </html>

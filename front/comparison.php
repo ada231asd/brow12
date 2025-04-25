@@ -60,7 +60,7 @@
         }
         
         .remove-btn {
-            color: #4600a3;
+            color: #994dff;
             cursor: pointer;
             text-decoration: underline;
         }

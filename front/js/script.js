@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initFilters() {
         await loadAllCategories();
-        await loadUserData(); // Загружаем данные пользователя перед загрузкой товаров
+        await loadUserData();
         await loadProducts();
         setupEventListeners();
     }
@@ -41,50 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     comparisons: data.data.comparisons || [],
                     cart: data.data.cart || []
                 };
-                // Убрано: updateComparisonCounter(window.userData.comparisons.length);
-                // Убрано: updateCartCounter(window.userData.cart.length);
             }
         } catch (error) {
             console.error('Ошибка загрузки данных пользователя:', error);
         }
     }
 
-    async function handleComparisonClick(btn) {
-        const productId = btn.dataset.productId;
-        const wasActive = btn.classList.contains('active');
-        
-        try {
-            // 1. Мгновенное визуальное обновление
-            btn.classList.toggle('active', !wasActive);
-            const icon = btn.querySelector('svg path');
-            if (icon) icon.style.fill = !wasActive ? '#8A33FD' : '#C8CACB';
+    // Функция для отправки события обновления счетчиков
+    function dispatchCounterUpdateEvent() {
+        const cartTotalQuantity = window.userData.cart.reduce((sum, item) => sum + item.quantity, 0);
+        const comparisonItems = window.userData.comparisons.length;
 
-            // 2. Отправка на сервер
-            const response = await fetch('../api/add_to_comparison.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ product_id: productId })
-            });
-
-            // 3. Проверка ответа
-            const result = await response.json();
-            if (result.status !== 'success') throw new Error(result.message);
-            
-            // 4. Обновление данных
-            await loadUserData();
-            // Убрано: updateComparisonCounter(window.userData.comparisons.length);
-            
-        } catch (error) {
-            console.error('Ошибка:', error);
-            // Возвращаем исходное состояние
-            btn.classList.toggle('active', wasActive);
-            const icon = btn.querySelector('svg path');
-            if (icon) icon.style.fill = wasActive ? '#8A33FD' : '#C8CACB';
-            
-            // Показываем уведомление об ошибке
-            showNotification(error.message || 'Ошибка при обновлении сравнения', 'error');
-        }
+        const event = new CustomEvent('updateCounters', {
+            detail: {
+                cartCount: cartTotalQuantity,
+                comparisonCount: comparisonItems
+            }
+        });
+        window.dispatchEvent(event);
     }
 
     async function loadCartState() {
@@ -94,15 +68,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             if (response.status === 401) {
-                // Пользователь не авторизован
                 return;
             }
             
             const data = await response.json();
             
             if (data.status === 'success') {
-                // Убрано: const cartCount = data.data.cart?.length || 0;
-                // Убрано: updateCartCounter(cartCount);
+                // Обновляем локальные данные
+                window.userData = {
+                    favorites: data.data.favorites || [],
+                    comparisons: data.data.comparisons || [],
+                    cart: data.data.cart || []
+                };
+                // Отправляем событие для обновления счетчиков
+                dispatchCounterUpdateEvent();
             } else {
                 console.error('Ошибка в ответе:', data.message);
             }
@@ -118,16 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
     
-            // Сброс предыдущего запроса
             if (abortController) {
                 try { abortController.abort(); } catch (e) { console.warn('Abort error:', e); }
             }
             abortController = new AbortController();
     
-            // Сброс состояния "нет результатов"
             noResultsBlock.style.display = 'none';
     
-            // Если запрос пустой - сбросить поиск
             if (query === '') {
                 currentFilters.searchQuery = null;
                 loadProducts();
@@ -218,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', function() {
                 const newRating = parseFloat(this.dataset.rating);
                 
-                if(currentFilters.rating === newRating) {
+                if (currentFilters.rating === newRating) {
                     this.classList.remove('active');
                     currentFilters.rating = 0;
                 } else {
@@ -239,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const categoryId = target.dataset.category;
             
-            if(currentFilters.category === categoryId) {
+            if (currentFilters.category === categoryId) {
                 target.classList.remove('active');
                 currentFilters.category = null;
             } else {
@@ -293,26 +269,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').value = '';
             document.getElementById('noResults').style.display = 'none';
             
-            // Обновляем данные пользователя перед повторной загрузкой
             await loadUserData();
             await loadProducts();
+            dispatchCounterUpdateEvent();
         });
     }
 
-    function renderProducts(products, containerId, favoriteProductIds = []) {
+    function renderProducts(products, containerId, favoriteProductIds = [], comparisonIds = []) {
         const container = document.getElementById(containerId);
         const noResultsBlock = document.getElementById('noResults');
-        const comparisonIds = window.userData?.comparisons?.map(item => item.product_id) || [];
-        const favoriteIds = window.userData?.favorites?.map(item => item.product_id) || [];
         if (!container || !noResultsBlock) return;
 
-        // Управление отображением результатов
         if (products.length === 0 && currentFilters.searchQuery) {
             container.style.display = 'none';
             noResultsBlock.style.display = 'flex';
-        } 
+        } else {
+            container.style.display = 'grid';
+            noResultsBlock.style.display = 'none';
+        }
 
-        // Рендер карточек товаров
         const renderStars = (rating) => {
             const numericRating = parseFloat(rating) || 0;
             const clampedRating = Math.min(Math.max(numericRating, 0), 5);
@@ -398,16 +373,51 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('');
 
-        // Обработчики событий для кнопок
         container.querySelectorAll('.btn-buy').forEach(btn => {
             btn.addEventListener('click', (e) => e.stopPropagation());
         });
 
         container.querySelectorAll('.btn-cart').forEach(btn => {
-            btn.addEventListener('click', (e) => e.stopPropagation());
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const productCard = e.target.closest('.product-card');
+                const comparisonBtn = productCard.querySelector('.comparison-btn');
+                const productId = comparisonBtn.dataset.productId;
+                
+                if (!productId) {
+                    console.error('Product ID not found');
+                    return;
+                }
+                
+                try {
+                    const addResponse = await fetch('../api/add_to_cart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ product_id: productId })
+                    });
+                    
+                    const addResult = await addResponse.json();
+                    
+                    if (addResult.status === 'success') {
+                        await loadUserData();
+                        dispatchCounterUpdateEvent();
+                        showNotification(addResult.message);
+                        animateCartButton(btn);
+                    } else {
+                        showNotification(addResult.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Ошибка при работе с корзиной:', error);
+                    showNotification('Произошла ошибка', 'error');
+                }
+            });
         });
 
-        // Обработчики для кнопок избранного
         container.querySelectorAll('.favorite-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -428,21 +438,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const result = await response.json();
                     
                     if (result.status === 'success') {
-                        // Обновляем состояние кнопки
                         btn.classList.toggle('active');
                         const icon = btn.querySelector('svg path');
                         icon.setAttribute('fill', btn.classList.contains('active') ? '#8A33FD' : '#C8CACB');
                         
-                        // Добавляем обновление данных пользователя
                         await loadUserData();
+                        dispatchCounterUpdateEvent();
                     }
                 } catch (error) {
                     console.error('Ошибка при добавлении в избранное:', error);
+                    showNotification('Произошла ошибка', 'error');
                 }
             });
         });
 
-        // Обработчики для кнопок сравнения
         container.querySelectorAll('.comparison-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -451,7 +460,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const productId = btn.dataset.productId;
                 const wasActive = btn.classList.contains('active');
         
-                // 1. Мгновенное визуальное обновление
                 btn.classList.toggle('active', !wasActive);
                 const icon = btn.querySelector('svg path');
                 if (icon) {
@@ -459,7 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
         
                 try {
-                    // 2. Отправка запроса на сервер
                     await fetch('../api/add_to_comparison.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -467,94 +474,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         body: JSON.stringify({ product_id: productId })
                     });
         
-                    // 3. Обновление данных через вашу функцию
                     await loadUserData();
+                    dispatchCounterUpdateEvent();
         
-                    // 4. Проверка актуального состояния
                     const isActuallyCompared = window.userData.comparisons.some(
                         item => item.product_id == productId
                     );
         
-                    // 5. Коррекция состояния если нужно
                     if (isActuallyCompared !== !wasActive) {
                         btn.classList.toggle('active');
                         if (icon) {
                             icon.style.fill = isActuallyCompared ? '#8A33FD' : '#C8CACB';
                         }
                     }
-        
                 } catch (error) {
                     console.error('Ошибка:', error);
-                    // Возврат к исходному состоянию
                     btn.classList.toggle('active', wasActive);
                     if (icon) {
                         icon.style.fill = wasActive ? '#8A33FD' : '#C8CACB';
                     }
+                    showNotification('Произошла ошибка', 'error');
                 }
             });
         });
 
         container.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                // Проверяем, был ли клик по самой карточке, а не по её дочерним элементам
                 if (e.target === card || card.contains(e.target)) {
-                    // Проверяем, что клик не был по кнопке или её дочерним элементам
-                    const isButtonClick = e.target.closest('.btn-buy, .btn-cart, .favorite-btn');
+                    const isButtonClick = e.target.closest('.btn-buy, .btn-cart, .favorite-btn, .comparison-btn');
                     if (!isButtonClick) {
-                        const productId = card.dataset.productId;
+                        const productId = card.querySelector('.favorite-btn').dataset.productId;
                         window.location.href = `../product.html?id=${productId}`;
                     }
                 }
             });
-        }); 
-
-        container.querySelectorAll('.btn-cart').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const productCard = e.target.closest('.product-card');
-                const comparisonBtn = productCard.querySelector('.comparison-btn');
-                const productId = comparisonBtn.dataset.productId;
-                
-                if (!productId) {
-                    console.error('Product ID not found');
-                    return;
-                }
-                
-                try {
-                    // 1. Добавляем товар в корзину
-                    const addResponse = await fetch('../api/add_to_cart.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ product_id: productId })
-                    });
-                    
-                    const addResult = await addResponse.json();
-                    
-                    if (addResult.status === 'success') {
-                        // 2. После успешного добавления запрашиваем обновленные данные пользователя
-                        await loadUserData();
-                        // Убрано: обновление счетчика корзины
-                        
-                        // 3. Показываем уведомление и анимацию
-                        showNotification(addResult.message);
-                        animateCartButton(btn);
-                    } else {
-                        showNotification(addResult.message, 'error');
-                    }
-                } catch (error) {
-                    console.error('Ошибка при работе с корзиной:', error);
-                    showNotification('Произошла ошибка', 'error');
-                }
-            });
-        });    
+        });
     }
 
-    // Функция для анимации кнопки корзины
     function animateCartButton(button) {
         button.classList.add('animate');
         setTimeout(() => {
@@ -562,22 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // Функция для показа уведомлений
     function showNotification(message, type = 'success') {
-        // Реализация зависит от вашей системы уведомлений
-        console.log(`${type}: ${message}`);
-        // Пример простой реализации:
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
-    }
-
-    // Функция для показа панели сравнения
-    function showComparisonPanel() {
-        // Реализация зависит от вашего интерфейса
-        console.log('Показываем панель сравнения');
     }
 
     initFilters();
