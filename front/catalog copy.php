@@ -8,6 +8,41 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css">
     <script src="js/auth-guard.js"></script>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.page-btn, .prev-btn, .next-btn {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.page-btn.active {
+    background-color: #8A33FD;
+    color: white;
+    border-color: #8A33FD;
+}
+
+.page-btn:hover, .prev-btn:hover, .next-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.prev-btn.disabled, .next-btn.disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+    border-color: #e0e0e0;
+}
+    </style>
 </head>
 <body>
 <?php require '../Header/header.html'; ?>
@@ -51,6 +86,7 @@
     </select>
     </div>
  <div class="catalog-container" id="products-container"></div>
+ <div id="paginationContainer" class="pagination"></div>
  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
     <div class="loader"></div>
 </div>

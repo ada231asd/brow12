@@ -405,7 +405,7 @@ function setupEventListeners(container) {
             const isButtonClick = e.target.closest('.btn-buy, .btn-cart, .favorite-btn, .comparison-btn');
             if (!isButtonClick) {
                 const productId = card.dataset.productId;
-                window.location.href = `product.html?id=${productId}`;
+                window.location.href = `product.php?id=${productId}`;
             }
         });
     });

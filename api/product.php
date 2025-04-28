@@ -12,7 +12,7 @@ try {
                 p.name AS product_name,
                 p.description,
                 c.name AS category_name,
-                CONCAT('backend/', p.image_url) AS image_url,
+                CONCAT('', p.image_url) AS image_url,
                 p.price,
                 p.discount,
                 ROUND(p.price * (1 - p.discount / 100)) AS final_price,
