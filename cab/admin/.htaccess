@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /cab/admin/
+
+    # Перенаправление всех запросов в index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+    # Разрешить доступ к статическим файлам
+    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico)$
+    RewriteRule ^(.*)$ $1 [L]
+</IfModule>
