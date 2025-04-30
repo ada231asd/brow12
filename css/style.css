@@ -651,6 +651,7 @@ footer .sm .bat_sm a {
 
 .favorite-btn.active {
   background-color: rgba(138, 51, 253, 0.1);
+  border-color: #8A33FD;
 }
 
 .favorite-btn.active svg path {
@@ -668,6 +669,7 @@ footer .sm .bat_sm a {
 
 .comparison-btn.active {
   background-color: rgba(138, 51, 253, 0.1);
+  border-color: #8A33FD;
 }
 
 .comparison-btn.active svg path {
@@ -807,6 +809,9 @@ footer .sm .bat_sm a {
   gap: 10px;
   padding: 0;
 }
+.custom-container .action-buttons .btn-cart {
+  border: #4E1E6D 2px solid;
+}
 .custom-container .btn-favorite,
 .custom-container .btn-comparison,
 .custom-container .btn-favorite svg,
@@ -836,7 +841,7 @@ footer .sm .bat_sm a {
   border-radius: 10px;
 }
 .custom-container .btn-primary-custom:hover {
-  background: #6b27c4;
+  background: #ffffff;
   transform: scale(1.05);
 }
 .custom-container .btn-secondary-custom {
@@ -855,7 +860,12 @@ footer .sm .bat_sm a {
 .custom-container .btn-comparison {
   background: transparent;
   border: none;
-  color: #6b27c4;
+  color: white;
+}
+.custom-container .btn-cart svg path,
+.custom-container .btn-favorite svg path,
+.custom-container .btn-comparison svg path {
+  fill: white;
 }
 .custom-container .btn-cart:hover,
 .custom-container .btn-favorite:hover,
@@ -1045,6 +1055,7 @@ footer .sm .bat_sm a {
   flex-direction: column;
   gap: 20px;
   min-height: 50px;
+  color: white;
 }
 .custom-container .review {
   padding: 15px;

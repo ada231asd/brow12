@@ -6,10 +6,10 @@ header("Access-Control-Allow-Credentials: true");
 require_once __DIR__ . '/../backend/ajax/db.php';
 
 $response = ['status' => 'error', 'message' => 'Неизвестная ошибка'];
-$MAX_COMPARISON_ITEMS = 4; // Максимальное количество товаров для сравнения
+$MAX_COMPARISON_ITEMS = 3; // Максимальное количество товаров для сравнения
 
 try {
-    // Проверка авторизации через куки (как в get_full_user.php)
+    // Проверка авторизации через куки
     if (empty($_COOKIE['auth_token'])) {
         http_response_code(401);
         throw new Exception('Доступ запрещен: требуется авторизация');
@@ -40,11 +40,13 @@ try {
     $productId = (int)$input['product_id'];
 
     // Проверка существования товара
-    $stmt = $pdo->prepare("SELECT product_id FROM Products WHERE product_id = ?");
+    $stmt = $pdo->prepare("SELECT product_id, category_id FROM Products WHERE product_id = ?");
     $stmt->execute([$productId]);
-    if (!$stmt->fetch()) {
+    $product = $stmt->fetch();
+    if (!$product) {
         throw new Exception('Товар не найден');
     }
+    $newProductCategoryId = $product['category_id'];
 
     // Получаем список сравнения пользователя
     $stmt = $pdo->prepare("
@@ -90,6 +92,23 @@ try {
 
         if ($count >= $MAX_COMPARISON_ITEMS) {
             throw new Exception("Максимум $MAX_COMPARISON_ITEMS товаров для сравнения");
+        }
+
+        // Проверяем категории существующих товаров
+        $stmt = $pdo->prepare("
+            SELECT p.category_id 
+            FROM Comparison_Items ci 
+            JOIN Products p ON ci.product_id = p.product_id 
+            WHERE ci.comparison_id = ?
+        ");
+        $stmt->execute([$comparisonId]);
+        $existingCategories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        if (!empty($existingCategories)) {
+            $firstCategoryId = $existingCategories[0];
+            if ($newProductCategoryId != $firstCategoryId) {
+                throw new Exception('Товары должны быть из одной категории');
+            }
         }
 
         // Добавляем в сравнение

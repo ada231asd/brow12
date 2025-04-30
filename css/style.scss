@@ -10,7 +10,7 @@ $secondary-bg: #2a2a2a;
 $text-primary: #e0e0e0;
 $text-secondary: #b0b0b0;
 $accent: #8A33FD;
-$accent-hover: #6b27c4;
+$accent-hover: #ffffff;
 $success: #2ecc71;
 $danger: #e74c3c;
 $danger-light: rgba(231, 76, 60, 0.1);
@@ -666,11 +666,13 @@ footer .sm .bat_sm a {
 
 .favorite-btn.active {
     background-color: rgba(138, 51, 253, 0.1);
+    border-color: #8A33FD;
 }
 
 .favorite-btn.active svg path {
     fill: #8A33FD;
 }
+
 
 .comparison-btn {
     cursor: pointer;
@@ -683,6 +685,7 @@ footer .sm .bat_sm a {
 
 .comparison-btn.active {
     background-color: rgba(138, 51, 253, 0.1);
+    border-color: #8A33FD;
 }
 
 .comparison-btn.active svg path {
@@ -831,6 +834,9 @@ footer .sm .bat_sm a {
         margin-right: 30px;
         gap: 10px;
         padding: 0;
+        .btn-cart{
+            border: #4E1E6D 2px solid;
+        }
     }
     .btn-favorite,
 .btn-comparison,
@@ -885,9 +891,11 @@ footer .sm .bat_sm a {
     .btn-comparison {
         background: transparent;
         border: none;
-        color: $accent-hover;
+        color: white;
         
-    
+        svg path {
+            fill:white;
+        }
         &:hover {
             background: transparent;
             color: $accent;
@@ -1094,6 +1102,7 @@ footer .sm .bat_sm a {
         flex-direction: column;
         gap: 20px;
         min-height: 50px;
+        color: white;
     }
     
     .review {

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/brow12/css/style.css">
 </head>
 <body>
+<div id="notificationContainer" class="notification-container"></div>
 <?php require 'Header/header.html'; ?>
     <div class="custom-container my-5">
         <a href="#" class="back-button back-btn text-decoration-none">← Назад</a>
@@ -43,7 +44,7 @@
                     <div class="price-and-buttons">
                         <div class="price-container"></div>
                         <div class="action-buttons">
-                            <button class="custom-btn btn-primary-custom">В корзину</button>
+                            <button class="custom-btn btn-cart btn-primary-custom">В корзину</button>
                             <button class="custom-btn btn-secondary-custom btn-buy">Купить в 1 клик</button>
                         </div>
                     </div>
@@ -90,7 +91,6 @@
                             </div>
                             <button type="submit" class="custom-btn btn-primary-custom">Отправить отзыв</button>
                         </form>
-                        <div id="notificationContainer" class="notification-container"></div>
                     </div>
                 </div>
             </div>

@@ -42,9 +42,35 @@
     cursor: not-allowed;
     border-color: #e0e0e0;
 }
+.notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .notification.success {
+            background-color: #141414;
+        }
+
+        .notification.error {
+            background-color: #141414;
+        }
+
+        .notification.info {
+            background-color: #141414;
+        }
     </style>
 </head>
 <body>
+<div id="notificationContainer" class="notification-container"></div>
 <?php require '../Header/header.html'; ?>
 <div class="catalog">
     <div class="filter_cont">

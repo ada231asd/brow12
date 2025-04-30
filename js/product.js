@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cart: []
     };
 
-    // Функция для отправки события обновления счетчиков
     const dispatchCounterUpdateEvent = () => {
         const cartTotalQuantity = userData.cart.reduce((sum, item) => sum + item.quantity, 0);
         const comparisonItems = userData.comparisons.length;
@@ -22,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.dispatchEvent(event);
     };
 
-    // Загрузка данных пользователя
     const loadUserData = async () => {
         try {
             const response = await fetch('/brow12/api/get_full_user.php', {
@@ -30,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
+
             if (data.status === 'success') {
                 userData = {
                     favorites: data.data.favorites || [],
@@ -39,20 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateButtonStates();
                 dispatchCounterUpdateEvent();
             }
-        } catch (error) {
-            // Ошибка обрабатывается без логов
-        }
+        } catch (error) {}
     };
 
-    // Обновление состояния кнопок избранного и сравнения
     const updateButtonStates = () => {
         const favoriteBtn = document.querySelector('.favorite-btn');
         const comparisonBtn = document.querySelector('.comparison-btn');
         const favoriteIcon = favoriteBtn?.querySelector('svg path');
         const comparisonIcon = comparisonBtn?.querySelector('svg path');
 
-        const isFavorite = userData.favorites.some(f => f.product_id == productId);
-        const isCompared = userData.comparisons.some(c => c.product_id == productId);
+        const isFavorite = userData.favorites.some(f => String(f.product_id) === String(productId));
+        const isCompared = userData.comparisons.some(c => String(c.product_id) === String(productId));
 
         if (favoriteBtn) {
             favoriteBtn.classList.toggle('active', isFavorite);
@@ -80,13 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showNotification = (message, type = 'success') => {
         const notificationContainer = document.getElementById('notificationContainer');
-        if (!notificationContainer) return;
-
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        notificationContainer.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
+        if (notificationContainer) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notificationContainer.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        } else {
+            alert(message);
+        }
     };
 
     const renderError = (message) => {
@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (productName) productName.textContent = product.product_name || 'Название отсутствует';
         if (productDescriptionTab) productDescriptionTab.textContent = product.description || 'Нет данных';
     
-        // Цена и скидка
         if (priceContainer) {
             const finalPrice = product.final_price ?? product.price;
             const hasDiscount = product.discount > 0;
@@ -167,14 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
                   `;
         }
     
-        // Рейтинг и количество отзывов
         if (productRating && reviewCount) {
             const reviewCountValue = approvedReviews.length;
             reviewCount.textContent = `(${reviewCountValue})`;
     
             if (reviewCountValue > 0) {
                 const averageRating = approvedReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / reviewCountValue;
-                const roundedRating = Math.round(averageRating * 10) / 10; // Округляем до 1 знака
+                const roundedRating = Math.round(averageRating * 10) / 10;
                 const fullStars = Math.floor(averageRating);
                 const hasHalfStar = averageRating - fullStars >= 0.5;
                 productRating.innerHTML = `
@@ -185,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     
-        // Характеристики
         if (specsList) {
             specsList.innerHTML = characteristics && characteristics.length > 0 
                 ? characteristics.map(c => `
@@ -197,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 : '<li>Нет данных</li>';
         }
     
-        // Отзывы
         if (reviewsList) {
             reviewsList.innerHTML = approvedReviews.length > 0
                 ? approvedReviews.map(r => `
@@ -243,14 +239,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const result = await response.json();
+
                 if (result.status === 'success') {
-                    showNotification('Отзыв отправлен на модерацию');
+                    showNotification('Отзыв отправлен на модерацию', 'success');
                     reviewForm.reset();
                 } else {
                     showNotification(result.message || 'Ошибка отправки отзыва', 'error');
                 }
             } catch (error) {
-                showNotification('Произошла ошибка', 'error');
+                showNotification('Произошла ошибка: ' + error.message, 'error');
             }
         });
     };
@@ -258,12 +255,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const setupActionButtons = () => {
         const favoriteBtn = document.querySelector('.favorite-btn');
         const comparisonBtn = document.querySelector('.comparison-btn');
-        const cartBtn = document.querySelector('.btn-cart');
         const buyBtn = document.querySelector('.btn-buy');
         const backBtn = document.querySelector('.back-btn');
 
         if (favoriteBtn) {
             favoriteBtn.addEventListener('click', async () => {
+                if (!productId) {
+                    showNotification('Товар не найден', 'error');
+                    return;
+                }
+
                 try {
                     const response = await fetch('/brow12/api/add_to_favorite.php', {
                         method: 'POST',
@@ -275,20 +276,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     const result = await response.json();
+
                     if (result.status === 'success') {
                         await loadUserData();
-                        showNotification(result.message || 'Добавлено в избранное');
+                        showNotification(result.message || 'Действие с избранным выполнено', 'success');
                     } else {
-                        showNotification(result.message || 'Ошибка', 'error');
+                        showNotification(result.message || 'Ошибка обработки избранного', 'error');
                     }
                 } catch (error) {
-                    showNotification('Произошла ошибка', 'error');
+                    showNotification('Произошла ошибка: ' + error.message, 'error');
                 }
             });
         }
 
         if (comparisonBtn) {
             comparisonBtn.addEventListener('click', async () => {
+                if (!productId) {
+                    showNotification('Товар не найден', 'error');
+                    return;
+                }
+
                 try {
                     const response = await fetch('/brow12/api/add_to_comparison.php', {
                         method: 'POST',
@@ -300,20 +307,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     const result = await response.json();
+
                     if (result.status === 'success') {
                         await loadUserData();
-                        showNotification(result.message || 'Добавлено в сравнение');
+                        showNotification(result.message || 'Действие со сравнением выполнено', 'success');
                     } else {
-                        showNotification(result.message || 'Ошибка', 'error');
+                        showNotification(result.message || 'Ошибка обработки сравнения', 'error');
                     }
                 } catch (error) {
-                    showNotification('Произошла ошибка', 'error');
+                    showNotification('Произошла ошибка: ' + error.message, 'error');
                 }
             });
         }
 
-        if (cartBtn) {
-            cartBtn.addEventListener('click', async () => {
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btn-cart')) {
+                const cartBtn = e.target;
+
+                if (!productId) {
+                    showNotification('Товар не найден', 'error');
+                    return;
+                }
+
+                const isAlreadyInCart = userData.cart.some(item => String(item.product_id) === String(productId));
+
+                if (isAlreadyInCart) {
+                    showNotification('Товар уже в корзине', 'info');
+                    return;
+                }
+
                 try {
                     const response = await fetch('/brow12/api/add_to_cart.php', {
                         method: 'POST',
@@ -324,20 +346,31 @@ document.addEventListener('DOMContentLoaded', () => {
                         body: JSON.stringify({ product_id: productId })
                     });
 
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
                     const result = await response.json();
+
+                    if (!result || typeof result !== 'object') {
+                        throw new Error('Некорректный ответ от сервера');
+                    }
+
                     if (result.status === 'success') {
                         await loadUserData();
-                        showNotification(result.message || 'Товар добавлен в корзину');
+                        showNotification(result.message || 'Товар добавлен в корзину', 'success');
                         cartBtn.classList.add('animate');
-                        setTimeout(() => cartBtn.classList.remove('animate'), 1000);
+                        setTimeout(() => {
+                            cartBtn.classList.remove('animate');
+                        }, 1000);
                     } else {
-                        showNotification(result.message || 'Ошибка', 'error');
+                        showNotification(result.message || 'Ошибка добавления в корзину', 'error');
                     }
                 } catch (error) {
-                    showNotification('Произошла ошибка', 'error');
+                    showNotification('Произошла ошибка: ' + error.message, 'error');
                 }
-            });
-        }
+            }
+        });
 
         if (buyBtn) {
             buyBtn.addEventListener('click', () => {

@@ -1,596 +1,832 @@
+const API_URL = '/admin_api.php';
+let currentSection = 'dashboard';
+let currentPage = 1;
+let perPage = 20;
+
 document.addEventListener('DOMContentLoaded', () => {
-    let currentFilters = {
-        rating: 0,
-        category: null,
-        filter: null,
-        sort: null,
-        searchQuery: null,
-        page: 1 // Текущая страница (по умолчанию 1)
+    loadNotifications();
+    loadSection(currentSection);
+    document.querySelectorAll('.sidebar nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentSection = e.target.dataset.section;
+            currentPage = 1;
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            const sectionElement = document.getElementById(currentSection);
+            if (sectionElement) {
+                sectionElement.classList.add('active');
+                document.getElementById('section-title').textContent = e.target.textContent;
+                loadSection(currentSection);
+            } else {
+                console.error(`Section with ID ${currentSection} not found`);
+            }
+        });
+    });
+
+    document.getElementById('logout').addEventListener('click', () => {
+        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        window.location.href = '/login.html';
+    });
+
+    // Bind search inputs
+    ['users', 'orders', 'products', 'categories', 'characteristics', 'news', 'promotions', 'carts', 
+     'comparison_lists', 'delivery_statuses', 'favorites', 'feedback', 'logs', 'recommendations', 
+     'reviews', 'stores', 'user_sessions', 'admin_logs'].forEach(section => {
+        const searchInput = document.getElementById(`${section}-search`);
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(() => {
+                currentPage = 1;
+                loadSection(section);
+            }, 300));
+        }
+    });
+
+    // Bind filter selects
+    ['products-category', 'characteristics-category', 'feedback-category', 'feedback-status'].forEach(filter => {
+        const select = document.getElementById(`${filter}-filter`);
+        if (select) {
+            select.addEventListener('change', () => {
+                currentPage = 1;
+                loadSection(filter.split('-')[0]);
+            });
+        }
+    });
+});
+
+async function loadSection(section) {
+    try {
+        if (section === 'dashboard') {
+            await loadAnalytics();
+        } else if (section === 'users') {
+            await loadUsers();
+        } else if (section === 'orders') {
+            await loadOrders();
+        } else if (section === 'products') {
+            await loadProducts();
+        } else if (section === 'categories') {
+            await loadCategories();
+        } else if (section === 'characteristics') {
+            await loadCharacteristics();
+        } else if (section === 'news') {
+            await loadNews();
+        } else if (section === 'promotions') {
+            await loadPromotions();
+        } else if (section === 'carts') {
+            await loadCarts();
+        } else if (section === 'comparison_lists') {
+            await loadComparisonLists();
+        } else if (section === 'delivery_statuses') {
+            await loadDeliveryStatuses();
+        } else if (section === 'favorites') {
+            await loadFavorites();
+        } else if (section === 'feedback') {
+            await loadFeedback();
+        } else if (section === 'logs') {
+            await loadLogs();
+        } else if (section === 'recommendations') {
+            await loadRecommendations();
+        } else if (section === 'reviews') {
+            await loadReviews();
+        } else if (section === 'stores') {
+            await loadStores();
+        } else if (section === 'user_sessions') {
+            await loadUserSessions();
+        } else if (section === 'admin_logs') {
+            await loadAdminLogs();
+        } else if (section === 'export') {
+            // Export handled separately
+        }
+    } catch (error) {
+        handleError(error);
+    }
+}
+
+async function loadNotifications() {
+    const response = await fetch(`${API_URL}?action=get_notifications`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        document.getElementById('notifications').innerHTML = result.data
+            .map(n => `<div class="notification">${n.message}</div>`)
+            .join('');
+    }
+}
+
+async function loadAnalytics() {
+    const response = await fetch(`${API_URL}?action=get_analytics`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const { total_users, total_orders, total_products, total_sales, sales_by_category, top_products } = result.data;
+        document.getElementById('total-users').textContent = total_users;
+        document.getElementById('total-orders').textContent = total_orders;
+        document.getElementById('total-products').textContent = total_products;
+        document.getElementById('total-sales').textContent = `${total_sales || 0} ₽`;
+
+        new Chart(document.getElementById('salesChart'), {
+            type: 'bar',
+            data: {
+                labels: sales_by_category.map(c => c.category_name),
+                datasets: [{
+                    label: 'Продажи по категориям',
+                    data: sales_by_category.map(c => c.total_sales),
+                    backgroundColor: '#3498db'
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        new Chart(document.getElementById('topProductsChart'), {
+            type: 'pie',
+            data: {
+                labels: top_products.map(p => p.name),
+                datasets: [{
+                    label: 'Топ-продукты',
+                    data: top_products.map(p => p.total_sales),
+                    backgroundColor: ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6']
+                }]
+            }
+        });
+    }
+}
+
+async function loadUsers() {
+    const search = document.getElementById('users-search').value;
+    const response = await fetch(`${API_URL}?action=get_users&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#users-table tbody');
+        tbody.innerHTML = result.data.map(user => `
+            <tr>
+                <td>${user.user_id}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role_name}</td>
+                <td>${user.phone || '-'}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_user', ${user.user_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_user', ${user.user_id}, 'users')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'users');
+    }
+}
+
+async function loadOrders() {
+    const search = document.getElementById('orders-search').value;
+    const response = await fetch(`${API_URL}?action=get_orders&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#orders-table tbody');
+        tbody.innerHTML = result.data.map(order => `
+            <tr>
+                <td>${order.order_id}</td>
+                <td>${order.order_code}</td>
+                <td>${order.user_name}</td>
+                <td>${order.order_status}</td>
+                <td>${order.total_price} ₽</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_order', ${order.order_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_order', ${order.order_id}, 'orders')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'orders');
+    }
+}
+
+async function loadProducts() {
+    const search = document.getElementById('products-search').value;
+    const category = document.getElementById('products-category-filter').value;
+    const url = `${API_URL}?action=get_products&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}${category ? `&category_id=${category}` : ''}`;
+    const response = await fetch(url, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#products-table tbody');
+        tbody.innerHTML = result.data.map(product => `
+            <tr>
+                <td>${product.product_id}</td>
+                <td>${product.name}</td>
+                <td>${product.category_name || '-'}</td>
+                <td>${product.price} ₽</td>
+                <td>${product.stock_quantity}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_product', ${product.product_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_product', ${product.product_id}, 'products')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'products');
+        await loadCategoryFilter('products');
+    }
+}
+
+async function loadCategories() {
+    const search = document.getElementById('categories-search').value;
+    const response = await fetch(`${API_URL}?action=get_categories&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#categories-table tbody');
+        tbody.innerHTML = result.data.map(category => `
+            <tr>
+                <td>${category.category_id}</td>
+                <td>${category.name}</td>
+                <td>${category.parent_name || '-'}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_category', ${category.category_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_category', ${category.category_id}, 'categories')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'categories');
+    }
+}
+
+async function loadCharacteristics() {
+    const search = document.getElementById('characteristics-search').value;
+    const category = document.getElementById('characteristics-category-filter').value;
+    const url = `${API_URL}?action=get_characteristics&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}${category ? `&category_id=${category}` : ''}`;
+    const response = await fetch(url, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#characteristics-table tbody');
+        tbody.innerHTML = result.data.map(char => `
+            <tr>
+                <td>${char.characteristic_id}</td>
+                <td>${char.name}</td>
+                <td>${char.value_type}</td>
+                <td>${char.category_name || '-'}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_characteristic', ${char.characteristic_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_characteristic', ${char.characteristic_id}, 'characteristics')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'characteristics');
+        await loadCategoryFilter('characteristics');
+    }
+}
+
+async function loadNews() {
+    const search = document.getElementById('news-search').value;
+    const response = await fetch(`${API_URL}?action=get_news&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#news-table tbody');
+        tbody.innerHTML = result.data.map(news => `
+            <tr>
+                <td>${news.news_id}</td>
+                <td>${news.title}</td>
+                <td>${new Date(news.created_at).toLocaleDateString()}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_news', ${news.news_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_news', ${news.news_id}, 'news')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'news');
+    }
+}
+
+async function loadPromotions() {
+    const search = document.getElementById('promotions-search').value;
+    const response = await fetch(`${API_URL}?action=get_promotions&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#promotions-table tbody');
+        tbody.innerHTML = result.data.map(promo => `
+            <tr>
+                <td>${promo.promotion_id}</td>
+                <td>${promo.title}</td>
+                <td>${promo.status}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_promotion', ${promo.promotion_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_promotion', ${promo.promotion_id}, 'promotions')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'promotions');
+    }
+}
+
+async function loadCarts() {
+    const search = document.getElementById('carts-search').value;
+    const response = await fetch(`${API_URL}?action=get_carts&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#carts-table tbody');
+        tbody.innerHTML = result.data.map(cart => `
+            <tr>
+                <td>${cart.cart_id}</td>
+                <td>${cart.user_name}</td>
+                <td>${cart.user_email}</td>
+                <td>
+                    <button class="delete" onclick="deleteItem('delete_cart', ${cart.cart_id}, 'carts')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'carts');
+    }
+}
+
+async function loadComparisonLists() {
+    const search = document.getElementById('comparison_lists-search').value;
+    const response = await fetch(`${API_URL}?action=get_comparison_lists&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#comparison_lists-table tbody');
+        tbody.innerHTML = result.data.map(list => `
+            <tr>
+                <td>${list.comparison_id}</td>
+                <td>${list.user_name}</td>
+                <td>${list.user_email}</td>
+                <td>
+                    <button class="delete" onclick="deleteItem('delete_comparison_list', ${list.comparison_id}, 'comparison_lists')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'comparison_lists');
+    }
+}
+
+async function loadDeliveryStatuses() {
+    const search = document.getElementById('delivery_statuses-search').value;
+    const response = await fetch(`${API_URL}?action=get_delivery_statuses&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#delivery_statuses-table tbody');
+        tbody.innerHTML = result.data.map(status => `
+            <tr>
+                <td>${status.delivery_status_id}</td>
+                <td>${status.order_code}</td>
+                <td>${status.status}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_delivery_status', ${status.delivery_status_id})">Редактировать</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'delivery_statuses');
+    }
+}
+
+async function loadFavorites() {
+    const search = document.getElementById('favorites-search').value;
+    const response = await fetch(`${API_URL}?action=get_favorites&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#favorites-table tbody');
+        tbody.innerHTML = result.data.map(favorite => `
+            <tr>
+                <td>${favorite.favorite_id}</td>
+                <td>${favorite.user_name}</td>
+                <td>${favorite.product_name}</td>
+                <td>
+                    <button class="delete" onclick="deleteItem('delete_favorite', ${favorite.favorite_id}, 'favorites')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'favorites');
+    }
+}
+
+async function loadFeedback() {
+    const search = document.getElementById('feedback-search').value;
+    const category = document.getElementById('feedback-category-filter').value;
+    const status = document.getElementById('feedback-status-filter').value;
+    const url = `${API_URL}?action=get_feedback&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}${category ? `&category=${category}` : ''}${status ? `&status=${status}` : ''}`;
+    const response = await fetch(url, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#feedback-table tbody');
+        tbody.innerHTML = result.data.map(feedback => `
+            <tr>
+                <td>${feedback.feedback_id}</td>
+                <td>${feedback.user_name || '-'}</td>
+                <td>${feedback.category}</td>
+                <td>${feedback.status}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_feedback', ${feedback.feedback_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_feedback', ${feedback.feedback_id}, 'feedback')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'feedback');
+    }
+}
+
+async function loadLogs() {
+    const search = document.getElementById('logs-search').value;
+    const response = await fetch(`${API_URL}?action=get_logs&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#logs-table tbody');
+        tbody.innerHTML = result.data.map(log => `
+            <tr>
+                <td>${log.log_id}</td>
+                <td>${log.user_name}</td>
+                <td>${log.action}</td>
+                <td>${new Date(log.created_at).toLocaleString()}</td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'logs');
+    }
+}
+
+async function loadRecommendations() {
+    const search = document.getElementById('recommendations-search').value;
+    const response = await fetch(`${API_URL}?action=get_recommendations&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#recommendations-table tbody');
+        tbody.innerHTML = result.data.map(rec => `
+            <tr>
+                <td>${rec.recommendation_id}</td>
+                <td>${rec.user_name}</td>
+                <td>${rec.product_name}</td>
+                <td>
+                    <button class="delete" onclick="deleteItem('delete_recommendation', ${rec.recommendation_id}, 'recommendations')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'recommendations');
+    }
+}
+
+async function loadReviews() {
+    const search = document.getElementById('reviews-search').value;
+    const response = await fetch(`${API_URL}?action=get_reviews&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#reviews-table tbody');
+        tbody.innerHTML = result.data.map(review => `
+            <tr>
+                <td>${review.review_id}</td>
+                <td>${review.user_name}</td>
+                <td>${review.product_name}</td>
+                <td>${review.rating}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_review', ${review.review_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_review', ${review.review_id}, 'reviews')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'reviews');
+    }
+}
+
+async function loadStores() {
+    const search = document.getElementById('stores-search').value;
+    const response = await fetch(`${API_URL}?action=get_stores&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#stores-table tbody');
+        tbody.innerHTML = result.data.map(store => `
+            <tr>
+                <td>${store.store_id}</td>
+                <td>${store.name}</td>
+                <td>${store.address}</td>
+                <td>${store.working_hours}</td>
+                <td>
+                    <button class="edit" onclick="openModal('edit_store', ${store.store_id})">Редактировать</button>
+                    <button class="delete" onclick="deleteItem('delete_store', ${store.store_id}, 'stores')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'stores');
+    }
+}
+
+async function loadUserSessions() {
+    const search = document.getElementById('user_sessions-search').value;
+    const response = await fetch(`${API_URL}?action=get_user_sessions&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#user_sessions-table tbody');
+        tbody.innerHTML = result.data.map(session => `
+            <tr>
+                <td>${session.session_id}</td>
+                <td>${session.user_name}</td>
+                <td>${session.token.substring(0, 10)}...</td>
+                <td>${new Date(session.expires_at).toLocaleString()}</td>
+                <td>
+                    <button class="delete" onclick="deleteItem('delete_user_session', ${session.session_id}, 'user_sessions')">Удалить</button>
+                </td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'user_sessions');
+    }
+}
+
+async function loadAdminLogs() {
+    const search = document.getElementById('admin_logs-search').value;
+    const response = await fetch(`${API_URL}?action=get_admin_logs&search=${encodeURIComponent(search)}&page=${currentPage}&per_page=${perPage}`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const tbody = document.querySelector('#admin_logs-table tbody');
+        tbody.innerHTML = result.data.map(log => `
+            <tr>
+                <td>${log.log_id}</td>
+                <td>${log.admin_name}</td>
+                <td>${log.action}</td>
+                <td>${new Date(log.created_at).toLocaleString()}</td>
+            </tr>
+        `).join('');
+        renderPagination(result.pagination, 'admin_logs');
+    }
+}
+
+async function loadCategoryFilter(section) {
+    const response = await fetch(`${API_URL}?action=get_categories&search=&page=1&per_page=1000`, { credentials: 'include' });
+    const result = await response.json();
+    if (result.status === 'success') {
+        const select = document.getElementById(`${section}-category-filter`);
+        select.innerHTML = '<option value="">Все категории</option>' + 
+            result.data.map(cat => `<option value="${cat.category_id}">${cat.name}</option>`).join('');
+    }
+}
+
+function renderPagination(pagination, section) {
+    const paginationDiv = document.getElementById(`${section}-pagination`);
+    paginationDiv.innerHTML = '';
+    for (let i = 1; i <= pagination.total_pages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        if (i === pagination.page) button.classList.add('active');
+        button.addEventListener('click', () => {
+            currentPage = i;
+            loadSection(section);
+        });
+        paginationDiv.appendChild(button);
+    }
+}
+
+async function openModal(action, id = null) {
+    const modal = document.getElementById('modal');
+    const form = document.getElementById('modal-form');
+    form.innerHTML = '';
+    let data = {};
+
+    if (action.startsWith('edit_')) {
+        const entity = action.replace('edit_', '');
+        const response = await fetch(`${API_URL}?action=get_${entity}s&search=&page=1&per_page=1`, { credentials: 'include' });
+        const result = await response.json();
+        data = result.data.find(item => item[`${entity}_id`] === id) || {};
+    }
+
+    if (action === 'add_user' || action === 'edit_user') {
+        const rolesResponse = await fetch(`${API_URL}?action=get_roles`, { credentials: 'include' });
+        const rolesResult = await rolesResponse.json();
+        form.innerHTML = `
+            <label>Имя</label>
+            <input type="text" name="name" value="${data.name || ''}" required>
+            <label>Email</label>
+            <input type="email" name="email" value="${data.email || ''}" required>
+            <label>Роль</label>
+            <select name="role_id" required>
+                <option value="">Выберите роль</option>
+                ${rolesResult.data.map(role => `<option value="${role.id}" ${data.role_id === role.id ? 'selected' : ''}>${role.name}</option>`).join('')}
+            </select>
+            <label>Телефон</label>
+            <input type="text" name="phone" value="${data.phone || ''}">
+            <label>Почтовый индекс</label>
+            <input type="text" name="postal_code" value="${data.postal_code || ''}">
+            <label>Способ оплаты</label>
+            <input type="text" name="preferred_payment_method" value="${data.preferred_payment_method || ''}">
+            <label>Способ доставки</label>
+            <input type="text" name="preferred_delivery_method" value="${data.preferred_delivery_method || ''}">
+            <button type="submit">${action === 'add_user' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'add_order' || action === 'edit_order') {
+        form.innerHTML = `
+            <label>Статус</label>
+            <select name="order_status" required>
+                <option value="Принят" ${data.order_status === 'Принят' ? 'selected' : ''}>Принят</option>
+                <option value="В процессе доставки" ${data.order_status === 'В процессе доставки' ? 'selected' : ''}>В процессе доставки</option>
+                <option value="Доставлен" ${data.order_status === 'Доставлен' ? 'selected' : ''}>Доставлен</option>
+                <option value="Возврат" ${data.order_status === 'Возврат' ? 'selected' : ''}>Возврат</option>
+            </select>
+            <label>Адрес доставки</label>
+            <input type="text" name="delivery_address" value="${data.delivery_address || ''}">
+            <button type="submit">${action === 'add_order' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'add_product' || action === 'edit_product') {
+        const categoriesResponse = await fetch(`${API_URL}?action=get_categories&search=&page=1&per_page=1000`, { credentials: 'include' });
+        const categoriesResult = await categoriesResponse.json();
+        let characteristicsHtml = '';
+        if (data.category_id) {
+            const charsResponse = await fetch(`${API_URL}?action=get_characteristics&category_id=${data.category_id}`, { credentials: 'include' });
+            const charsResult = await charsResponse.json();
+            characteristicsHtml = charsResult.data.map(char => `
+                <label>${char.name} (${char.value_type})</label>
+                <input type="${char.value_type === 'Число' ? 'number' : 'text'}" name="characteristic_${char.characteristic_id}" value="${data.characteristics?.find(c => c.characteristic_id === char.characteristic_id)?.value || ''}">
+            `).join('');
+        }
+        form.innerHTML = `
+            <label>Название</label>
+            <input type="text" name="name" value="${data.name || ''}" required>
+            <label>Описание</label>
+            <textarea name="description">${data.description || ''}</textarea>
+            <label>Цена</label>
+            <input type="number" name="price" value="${data.price || ''}" required>
+            <label>Количество на складе</label>
+            <input type="number" name="stock_quantity" value="${data.stock_quantity || ''}" required>
+            <label>Категория</label>
+            <select name="category_id">
+                <option value="">Без категории</option>
+                ${categoriesResult.data.map(cat => `<option value="${cat.category_id}" ${data.category_id === cat.category_id ? 'selected' : ''}>${cat.name}</option>`).join('')}
+            </select>
+            <label>Изображение</label>
+            <input type="file" name="image" accept="image/*">
+            <label><input type="checkbox" name="is_bestseller" ${data.is_bestseller ? 'checked' : ''}> Бестселлер</label>
+            <label><input type="checkbox" name="is_new" ${data.is_new ? 'checked' : ''}> Новинка</label>
+            <label>Скидка (%)</label>
+            <input type="number" name="discount" value="${data.discount || '0'}">
+            ${characteristicsHtml}
+            <button type="submit">${action === 'add_product' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'add_category' || action === 'edit_category') {
+        const categoriesResponse = await fetch(`${API_URL}?action=get_categories&search=&page=1&per_page=1000`, { credentials: 'include' });
+        const categoriesResult = await categoriesResponse.json();
+        form.innerHTML = `
+            <label>Название</label>
+            <input type="text" name="name" value="${data.name || ''}" required>
+            <label>Родительская категория</label>
+            <select name="parent_category_id">
+                <option value="">Нет</option>
+                ${categoriesResult.data.map(cat => `<option value="${cat.category_id}" ${data.parent_category_id === cat.category_id ? 'selected' : ''}>${cat.name}</option>`).join('')}
+            </select>
+            <button type="submit">${action === 'add_category' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'add_characteristic' || action === 'edit_characteristic') {
+        const categoriesResponse = await fetch(`${API_URL}?action=get_categories&search=&page=1&per_page=1000`, { credentials: 'include' });
+        const categoriesResult = await categoriesResponse.json();
+        form.innerHTML = `
+            <label>Название</label>
+            <input type="text" name="name" value="${data.name || ''}" required>
+            <label>Тип значения</label>
+            <select name="value_type" required>
+                <option value="Текст" ${data.value_type === 'Текст' ? 'selected' : ''}>Текст</option>
+                <option value="Число" ${data.value_type === 'Число' ? 'selected' : ''}>Число</option>
+            </select>
+            <label>Категория</label>
+            <select name="category_id" required>
+                <option value="">Выберите категорию</option>
+                ${categoriesResult.data.map(cat => `<option value="${cat.category_id}" ${data.category_id === cat.category_id ? 'selected' : ''}>${cat.name}</option>`).join('')}
+            </select>
+            <button type="submit">${action === 'add_characteristic' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'add_news' || action === 'edit_news') {
+        form.innerHTML = `
+            <label>Заголовок</label>
+            <input type="text" name="title" value="${data.title || ''}" required>
+            <label>Контент</label>
+            <textarea name="content" required>${data.content || ''}</textarea>
+            <label>Изображение</label>
+            <input type="file" name="image" accept="image/*">
+            <button type="submit">${action === 'add_news' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'add_promotion' || action === 'edit_promotion') {
+        const categoriesResponse = await fetch(`${API_URL}?action=get_categories&search=&page=1&per_page=1000`, { credentials: 'include' });
+        const categoriesResult = await categoriesResponse.json();
+        form.innerHTML = `
+            <label>Заголовок</label>
+            <input type="text" name="title" value="${data.title || ''}" required>
+            <label>Описание</label>
+            <textarea name="description">${data.description || ''}</textarea>
+            <label>Дата начала</label>
+            <input type="date" name="start_date" value="${data.start_date?.split(' ')[0] || ''}" required>
+            <label>Дата окончания</label>
+            <input type="date" name="end_date" value="${data.end_date?.split(' ')[0] || ''}" required>
+            <label>Категория</label>
+            <select name="category_id">
+                <option value="">Без категории</option>
+                ${categoriesResult.data.map(cat => `<option value="${cat.category_id}" ${data.category_id === cat.category_id ? 'selected' : ''}>${cat.name}</option>`).join('')}
+            </select>
+            <label>Изображение</label>
+            <input type="file" name="image" accept="image/*">
+            <button type="submit">${action === 'add_promotion' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    } else if (action === 'edit_delivery_status') {
+        form.innerHTML = `
+            <label>Статус</label>
+            <select name="status" required>
+                <option value="Принят" ${data.status === 'Принят' ? 'selected' : ''}>Принят</option>
+                <option value="В процессе доставки" ${data.status === 'В процессе доставки' ? 'selected' : ''}>В процессе доставки</option>
+                <option value="Доставлен" ${data.status === 'Доставлен' ? 'selected' : ''}>Доставлен</option>
+                <option value="Возврат" ${data.status === 'Возврат' ? 'selected' : ''}>Возврат</option>
+            </select>
+            <button type="submit">Сохранить</button>
+        `;
+    } else if (action === 'edit_feedback') {
+        form.innerHTML = `
+            <label>Категория</label>
+            <select name="category" required>
+                <option value="Техподдержка" ${data.category === 'Техподдержка' ? 'selected' : ''}>Техподдержка</option>
+                <option value="Заказ" ${data.category === 'Заказ' ? 'selected' : ''}>Заказ</option>
+                <option value="Другое" ${data.category === 'Другое' ? 'selected' : ''}>Другое</option>
+            </select>
+            <label>Ответ</label>
+            <textarea name="response">${data.response || ''}</textarea>
+            <label>Статус</label>
+            <select name="status" required>
+                <option value="Зарегистрирован" ${data.status === 'Зарегистрирован' ? 'selected' : ''}>Зарегистрирован</option>
+                <option value="В обработке" ${data.status === 'В обработке' ? 'selected' : ''}>В обработке</option>
+                <option value="Закрыт" ${data.status === 'Закрыт' ? 'selected' : ''}>Закрыт</option>
+            </select>
+            <button type="submit">Сохранить</button>
+        `;
+    } else if (action === 'edit_review') {
+        form.innerHTML = `
+            <label>Рейтинг</label>
+            <input type="number" name="rating" value="${data.rating || ''}" min="1" max="5" required>
+            <label>Комментарий</label>
+            <textarea name="comment">${data.comment || ''}</textarea>
+            <button type="submit">Сохранить</button>
+        `;
+    } else if (action === 'add_store' || action === 'edit_store') {
+        form.innerHTML = `
+            <label>Название</label>
+            <input type="text" name="name" value="${data.name || ''}" required>
+            <label>Адрес</label>
+            <input type="text" name="address" value="${data.address || ''}" required>
+            <label>Широта</label>
+            <input type="number" name="latitude" step="any" value="${data.latitude || ''}">
+            <label>Долгота</label>
+            <input type="number" name="longitude" step="any" value="${data.longitude || ''}">
+            <label>Часы работы</label>
+            <input type="text" name="working_hours" value="${data.working_hours || ''}" required>
+            <button type="submit">${action === 'add_store' ? 'Добавить' : 'Сохранить'}</button>
+        `;
+    }
+
+    if (id) {
+        form.innerHTML += `<input type="hidden" name="${action.replace('edit_', '')}_id" value="${id}">`;
+    }
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        formData.append('action', action);
+        await submitForm(formData);
     };
 
-    const PRODUCTS_PER_PAGE = 20; // Количество продуктов на странице
-    let totalProducts = 0; // Общее количество продуктов для расчета страниц
-    let searchTimeout = null;
-    let abortController = null;
-    let allCategories = new Map();
+    modal.style.display = 'block';
+}
 
-    async function initFilters() {
-        await loadAllCategories();
-        await loadUserData();
-        await loadProducts();
-        setupEventListeners();
-    }
-
-    function setupEventListeners() {
-        setupRatingFilter();
-        setupCategoryFilter();
-        setupSpecialFilters();
-        setupSorting();
-        setupResetButton();
-        setupSearch();
-        setupPagination();
-        loadCartState();
-    }
-
-    async function loadUserData() {
-        try {
-            const response = await fetch('../api/get_full_user.php', {
-                credentials: 'include'
-            });
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                window.userData = {
-                    favorites: data.data.favorites || [],
-                    comparisons: data.data.comparisons || [],
-                    cart: data.data.cart || []
-                };
-            }
-        } catch (error) {
-            console.error('Ошибка загрузки данных пользователя:', error);
-        }
-    }
-
-    // Функция для отправки события обновления счетчиков
-    function dispatchCounterUpdateEvent() {
-        const cartTotalQuantity = window.userData.cart.reduce((sum, item) => sum + item.quantity, 0);
-        const comparisonItems = window.userData.comparisons.length;
-
-        const event = new CustomEvent('updateCounters', {
-            detail: {
-                cartCount: cartTotalQuantity,
-                comparisonCount: comparisonItems
-            }
+async function submitForm(formData) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
         });
-        window.dispatchEvent(event);
-    }
-
-    async function loadCartState() {
-        try {
-            const response = await fetch('../api/get_full_user.php', {
-                credentials: 'include'
-            });
-            
-            if (response.status === 401) {
-                return;
-            }
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                window.userData = {
-                    favorites: data.data.favorites || [],
-                    comparisons: data.data.comparisons || [],
-                    cart: data.data.cart || []
-                };
-                dispatchCounterUpdateEvent();
-            } else {
-                console.error('Ошибка в ответе:', data.message);
-            }
-        } catch (error) {
-            console.error('Ошибка при загрузке состояния корзины:', error);
-        }
-    }
-
-    function setupSearch() {
-        const searchInput = document.getElementById('searchInput');
-        const noResultsBlock = document.getElementById('noResults');
-    
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-    
-            if (abortController) {
-                try { abortController.abort(); } catch (e) { console.warn('Abort error:', e); }
-            }
-            abortController = new AbortController();
-    
-            noResultsBlock.style.display = 'none';
-    
-            if (query === '') {
-                currentFilters.searchQuery = null;
-                currentFilters.page = 1; // Сбрасываем страницу при очистке поиска
-                loadProducts();
-                return;
-            }
-    
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                try {
-                    currentFilters.searchQuery = query;
-                    currentFilters.page = 1; // Сбрасываем страницу при новом поиске
-                    await loadProducts();
-                } catch (error) {
-                    if (error.name !== 'AbortError') {
-                        console.error('Search error:', error);
-                    }
-                }
-            }, 500);
-        });
-    }
-
-    async function loadAllCategories() {
-        try {
-            const response = await fetch(`../api/products.php`);
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                const categoriesMap = new Map();
-                data.data.forEach(product => {
-                    if (product.category_id && product.category_name) {
-                        categoriesMap.set(product.category_id, product.category_name);
-                    }
-                });
-                allCategories = categoriesMap;
-                renderCategories();
-            }
-        } catch (error) {
-            console.error('Ошибка загрузки категорий:', error);
-        }
-    }
-
-    async function loadProducts() {
-        try {
-            let apiUrl;
-            let params;
-        
-            if (currentFilters.searchQuery) {
-                apiUrl = '../api/search.php';
-                params = new URLSearchParams({ query: currentFilters.searchQuery });
-            } else {
-                apiUrl = '../api/products.php';
-                params = new URLSearchParams();
-                
-                if (currentFilters.rating > 0) params.append('rating', currentFilters.rating);
-                if (currentFilters.category) params.append('category', currentFilters.category);
-                if (currentFilters.filter) params.append('filter', currentFilters.filter);
-                if (currentFilters.sort) params.append('sort', currentFilters.sort);
-            }
-        
-            const response = await fetch(`${apiUrl}?${params}`);
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                totalProducts = data.data.length; // Сохраняем общее количество продуктов
-                const favoriteIds = window.userData?.favorites?.map(item => item.product_id) || [];
-                const comparisonIds = window.userData?.comparisons?.map(item => item.product_id) || [];
-                
-                // Пагинация: выбираем продукты для текущей страницы
-                const startIndex = (currentFilters.page - 1) * PRODUCTS_PER_PAGE;
-                const endIndex = startIndex + PRODUCTS_PER_PAGE;
-                const paginatedProducts = data.data.slice(startIndex, endIndex);
-                
-                renderProducts(paginatedProducts, 'products-container', favoriteIds, comparisonIds);
-                renderPagination();
-            }
-        } catch (error) {
-            console.error('Ошибка загрузки продуктов:', error);
-            document.getElementById('noResults').style.display = 'flex';
-        }
-    }
-
-    function renderCategories() {
-        const container = document.getElementById('categoriesContainer');
-        if (!container || !allCategories) return;
-
-        container.innerHTML = Array.from(allCategories).map(([id, name]) => `
-            <div class="category-btn ${currentFilters.category == id ? 'active' : ''}" 
-                 data-category="${id}">
-                ${name}
-            </div>
-        `).join('');
-    }
-
-    function setupRatingFilter() {
-        document.querySelectorAll('.rating-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const newRating = parseFloat(this.dataset.rating);
-                
-                if (currentFilters.rating === newRating) {
-                    this.classList.remove('active');
-                    currentFilters.rating = 0;
-                } else {
-                    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilters.rating = newRating;
-                }
-                currentFilters.page = 1; // Сбрасываем страницу при изменении фильтра
-                loadProducts();
-            });
-        });
-    }
-
-    function setupCategoryFilter() {
-        const container = document.getElementById('categoriesContainer');
-        container.addEventListener('click', e => {
-            const target = e.target.closest('.category-btn');
-            if (!target) return;
-
-            const categoryId = target.dataset.category;
-            
-            if (currentFilters.category === categoryId) {
-                target.classList.remove('active');
-                currentFilters.category = null;
-            } else {
-                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                target.classList.add('active');
-                currentFilters.category = categoryId;
-            }
-            currentFilters.page = 1; // Сбрасываем страницу при изменении категории
-            loadProducts();
-        });
-    }
-
-    function setupSpecialFilters() {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (currentFilters.filter !== this.dataset.filter) {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilters.filter = this.dataset.filter;
-                } else {
-                    this.classList.remove('active');
-                    currentFilters.filter = null;
-                }
-                currentFilters.page = 1; // Сбрасываем страницу при изменении фильтра
-                loadProducts();
-            });
-        });
-    }
-
-    function setupSorting() {
-        const sortSelect = document.getElementById('sortSelect');
-        if (!sortSelect) return;
-
-        sortSelect.addEventListener('change', function() {
-            currentFilters.sort = this.value || null;
-            currentFilters.page = 1; // Сбрасываем страницу при изменении сортировки
-            loadProducts();
-        });
-    }
-
-    async function setupResetButton() {
-        const resetBtn = document.getElementById('resetFilters');
-        resetBtn.addEventListener('click', async () => {
-            currentFilters = { 
-                rating: 0, 
-                category: null, 
-                filter: null, 
-                sort: null,
-                searchQuery: null,
-                page: 1 // Сбрасываем страницу
-            };
-            
-            document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-            document.getElementById('sortSelect').value = '';
-            document.getElementById('searchInput').value = '';
-            document.getElementById('noResults').style.display = 'none';
-            
-            await loadUserData();
-            await loadProducts();
-            dispatchCounterUpdateEvent();
-        });
-    }
-
-    // Новая функция для настройки пагинации
-    function setupPagination() {
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (!paginationContainer) return;
-
-        paginationContainer.addEventListener('click', (e) => {
-            const target = e.target.closest('.page-btn, .prev-btn, .next-btn');
-            if (!target) return;
-
-            if (target.classList.contains('prev-btn') && currentFilters.page > 1) {
-                currentFilters.page--;
-            } else if (target.classList.contains('next-btn') && currentFilters.page < Math.ceil(totalProducts / PRODUCTS_PER_PAGE)) {
-                currentFilters.page++;
-            } else if (target.classList.contains('page-btn')) {
-                currentFilters.page = parseInt(target.dataset.page);
-            }
-
-            loadProducts();
-        });
-    }
-
-    // Новая функция для рендеринга пагинации
-    function renderPagination() {
-        const paginationContainer = document.getElementById('paginationContainer');
-        if (!paginationContainer) return;
-
-        const totalPages = Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
-        if (totalPages <= 1) {
-            paginationContainer.innerHTML = '';
-            return;
-        }
-
-        let paginationHTML = `
-            <button class="prev-btn ${currentFilters.page === 1 ? 'disabled' : ''}">←</button>
-        `;
-
-        for (let i = 1; i <= totalPages; i++) {
-            paginationHTML += `
-                <button class="page-btn ${currentFilters.page === i ? 'active' : ''}" data-page="${i}">${i}</button>
-            `;
-        }
-
-        paginationHTML += `
-            <button class="next-btn ${currentFilters.page === totalPages ? 'disabled' : ''}">→</button>
-        `;
-
-        paginationContainer.innerHTML = paginationHTML;
-    }
-
-    function renderProducts(products, containerId, favoriteProductIds = [], comparisonIds = []) {
-        const container = document.getElementById(containerId);
-        const noResultsBlock = document.getElementById('noResults');
-        if (!container || !noResultsBlock) return;
-    
-        if (products.length === 0 && currentFilters.searchQuery) {
-            container.style.display = 'none';
-            noResultsBlock.style.display = 'flex';
+        const result = await response.json();
+        if (result.status === 'success') {
+            closeModal();
+            loadSection(currentSection);
+            alert(result.message);
         } else {
-            container.style.display = 'grid';
-            noResultsBlock.style.display = 'none';
+            alert(result.message);
         }
-    
-        const renderStars = (rating) => {
-            const numericRating = parseFloat(rating) || 0;
-            const clampedRating = Math.min(Math.max(numericRating, 0), 5);
-            const fullStars = Math.floor(clampedRating);
-            const hasHalfStar = clampedRating % 1 >= 0.5;
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    
-            return `
-                ${'<div class="star full"></div>'.repeat(fullStars)}
-                ${hasHalfStar ? '<div class="star half"></div>' : ''}
-                ${'<div class="star empty"></div>'.repeat(emptyStars)}
-            `;
+    } catch (error) {
+        handleError(error);
+    }
+}
+
+async function deleteItem(action, id, section) {
+    if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append(`${action.replace('delete_', '')}_id`, id);
+        await submitForm(formData);
+    }
+}
+
+async function exportData() {
+    const table = document.getElementById('export-table').value;
+    window.location.href = `${API_URL}?action=export_data&table=${table}&format=csv`;
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function handleError(error) {
+    console.error(error);
+    if (error.message.includes('401') || error.message.includes('403')) {
+        window.location.href = '/login.html';
+    } else {
+        alert('Ошибка: ' + error.message);
+    }
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
         };
-    
-        container.innerHTML = products.map(product => `
-            <div class="product-card">
-                ${product.is_bestseller ? `
-                    <div class="status hit">Хит продаж</div>
-                ` : product.is_new ? `
-                    <div class="status new">Новинка</div>
-                ` : `
-                    <div class="status no-status"></div>
-                `}
-                
-                <img src="../${product.image_url}" 
-                     class="product-image" 
-                     alt="${product.name}"
-                     onerror="this.src=''">
-                
-                <div class="name_l"> 
-                    <p class="product-category">${product.category_name}</p>            
-                    <h3 class="product-title">${product.name}</h3>
-                </div>
-                
-                <div class="blok_inf">
-                    <div class="rating-block">
-                        <div class="stars">${renderStars(product.average_rating)}</div>
-                        <div class="reviews">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span>(${product.reviews_count || 0})</span>
-                        </div>
-                    </div>
-                    <div class="ppt">
-                        <div class="price-block ${product.discount > 0 ? 'with-discount' : 'no-discount'}">
-                            ${product.discount > 0 ? `
-                                <div class="old-price">${Math.round(product.price || 0).toLocaleString()} ₽</div>
-                                <div class="current-price">${Math.round(product.final_price || 0).toLocaleString()} ₽</div>
-                                <div class="discount-badge">
-                                    <p>-${Math.round(product.discount)}% </p>
-                                    <span>- ${Math.round((product.price - product.final_price) || 0).toLocaleString()} ₽</span>
-                                </div>
-                            ` : `
-                                <div class="current-price">${Math.round(product.price || 0).toLocaleString()} ₽</div>
-                            `}
-                        </div>
-                        <div class="but_t">
-                            <div class="button favorite-btn ${favoriteProductIds.includes(product.product_id) ? 'active' : ''}" data-product-id="${product.product_id}">
-                                <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M19.1603 2.00017C18.1002 0.937373 16.6951 0.288706 15.1986 0.171335C13.7021 0.0539653 12.213 0.475631 11.0003 1.36017C9.72793 0.413803 8.14427 -0.0153233 6.5682 0.159203C4.99212 0.333729 3.54072 1.09894 2.50625 2.30075C1.47178 3.50256 0.931098 5.05169 0.993077 6.63618C1.05506 8.22067 1.71509 9.72283 2.84028 10.8402L9.05028 17.0602C9.57029 17.5719 10.2707 17.8588 11.0003 17.8588C11.7299 17.8588 12.4303 17.5719 12.9503 17.0602L19.1603 10.8402C20.3279 9.66543 20.9832 8.07644 20.9832 6.42017C20.9832 4.76389 20.3279 3.1749 19.1603 2.00017ZM17.7503 9.46017L11.5403 15.6702C11.4696 15.7415 11.3855 15.7982 11.2928 15.8368C11.2001 15.8755 11.1007 15.8954 11.0003 15.8954C10.8999 15.8954 10.8004 15.8755 10.7077 15.8368C10.615 15.7982 10.5309 15.7415 10.4603 15.6702L4.25028 9.43017C3.46603 8.62851 3.02689 7.55163 3.02689 6.43017C3.02689 5.3087 3.46603 4.23182 4.25028 3.43017C5.04943 2.64115 6.12725 2.19873 7.25028 2.19873C8.3733 2.19873 9.45112 2.64115 10.2503 3.43017C10.3432 3.52389 10.4538 3.59829 10.5757 3.64906C10.6976 3.69983 10.8283 3.72596 10.9603 3.72596C11.0923 3.72596 11.223 3.69983 11.3449 3.64906C11.4667 3.59829 11.5773 3.52389 11.6703 3.43017C12.4694 2.64115 13.5472 2.19873 14.6703 2.19873C15.7933 2.19873 16.8711 2.64115 17.6703 3.43017C18.4653 4.22132 18.9189 5.29236 18.9338 6.41385C18.9488 7.53535 18.5239 8.6181 17.7503 9.43017V9.46017Z" fill="${favoriteProductIds.includes(product.product_id) ? '#8A33FD' : '#C8CACB'}"/>
-                                </svg>
-                            </div>
-                            <div class="button comparison-btn ${comparisonIds.includes(product.product_id) ? 'active' : ''}" data-product-id="${product.product_id}">
-                                <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M1 10C0.734784 10 0.48043 10.1054 0.292893 10.2929C0.105357 10.4804 0 10.7348 0 11V19C0 19.2652 0.105357 19.5196 0.292893 19.7071C0.48043 19.8946 0.734784 20 1 20C1.26522 20 1.51957 19.8946 1.70711 19.7071C1.89464 19.5196 2 19.2652 2 19V11C2 10.7348 1.89464 10.4804 1.70711 10.2929C1.51957 10.1054 1.26522 10 1 10ZM6 0C5.73478 0 5.48043 0.105357 5.29289 0.292893C5.10536 0.48043 5 0.734784 5 1V19C5 19.2652 5.10536 19.5196 5.29289 19.7071C5.48043 19.8946 5.73478 20 6 20C6.26522 20 6.51957 19.8946 6.70711 19.7071C6.89464 19.5196 7 19.2652 7 19V1C7 0.734784 6.89464 0.48043 6.70711 0.292893C6.51957 0.105357 6.26522 0 6 0ZM16 14C15.7348 14 15.4804 14.1054 15.2929 14.2929C15.1054 14.4804 15 14.7348 15 15V19C15 19.2652 15.1054 19.5196 15.2929 19.7071C15.4804 19.8946 15.7348 20 16 20C16.2652 20 16.5196 19.8946 16.7071 19.7071C16.8946 19.2652 17 19.2652 17 19V15C17 14.7348 16.8946 14.4804 16.7071 14.2929C16.5196 14.1054 16.2652 14 16 14ZM11 6C10.7348 6 10.4804 6.10536 10.2929 6.29289C10.1054 6.48043 10 6.73478 10 7V19C10 19.2652 10.1054 19.5196 10.2929 19.7071C10.4804 19.8946 10.7348 20 11 20C11.2652 20 11.5196 19.8946 11.7071 19.7071C11.8946 19.5196 12 19.2652 12 19V7C12 6.73478 11.8946 6.48043 11.7071 6.29289C11.5196 6.10536 11.2652 6 11 6Z" fill="${comparisonIds.includes(product.product_id) ? '#8A33FD' : '#C8CACB'}"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="product-actions">
-                        <button class="btn-buy">Купить в 1 клик</button>
-                        <button class="btn-cart">
-                            <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M7.38164 19.7034C8.20955 19.7034 8.88071 19.0394 8.88071 18.2203C8.88071 17.4011 8.20955 16.7371 7.38164 16.7371C6.55372 16.7371 5.88257 17.4011 5.88257 18.2203C5.88257 19.0394 6.55372 19.7034 7.38164 19.7034Z" fill="white"/>
-                                <path d="M16.4893 19.7034C17.3173 19.7034 17.9884 19.0394 17.9884 18.2203C17.9884 17.4011 17.3173 16.7371 16.4893 16.7371C15.6614 16.7371 14.9903 17.4011 14.9903 18.2203C14.9903 19.0394 15.6614 19.7034 16.4893 19.7034Z" fill="white"/>
-                                <path d="M20.5402 2.13853C20.4782 2.06292 20.4 2.00183 20.3113 1.95966C20.2226 1.91749 20.1256 1.89529 20.0272 1.89464H9.06608C8.61737 1.89464 8.2998 2.33323 8.43984 2.75953C8.52872 3.03009 8.7813 3.21298 9.06608 3.21298H19.1544L17.3755 10.1455H7.38164L4.33685 1.58484C4.30392 1.48363 4.24673 1.3918 4.17016 1.31719C4.09359 1.24259 3.99992 1.18741 3.89713 1.15638L1.16548 0.325828C1.08149 0.300292 0.993233 0.291373 0.905756 0.299582C0.818278 0.307791 0.733291 0.332967 0.655647 0.373671C0.498839 0.455877 0.38146 0.596345 0.329333 0.764174C0.277206 0.932002 0.294601 1.11344 0.377691 1.26858C0.46078 1.42372 0.602759 1.53985 0.772393 1.59143L3.16425 2.3165L6.22236 10.8969L5.1297 11.7802L5.04308 11.8659C4.77281 12.174 4.61961 12.5658 4.60988 12.9737C4.60016 13.3816 4.7345 13.78 4.98978 14.1005C5.17138 14.319 5.40213 14.4924 5.66359 14.6068C5.92505 14.7213 6.20996 14.7736 6.49552 14.7596H17.6153C17.792 14.7596 17.9615 14.6902 18.0864 14.5666C18.2114 14.4429 18.2816 14.2753 18.2816 14.1005C18.2816 13.9256 18.2114 13.758 18.0864 13.6344C17.9615 13.5107 17.792 13.4413 17.6153 13.4413H6.38892C6.3122 13.4387 6.23745 13.4166 6.17189 13.3771C6.10634 13.3375 6.05219 13.282 6.01468 13.2157C5.97717 13.1494 5.95757 13.0747 5.95777 12.9988C5.95797 12.9228 5.97796 12.8482 6.01582 12.7821L7.62149 11.4638H17.9085C18.0625 11.4675 18.213 11.4183 18.3345 11.3246C18.456 11.2308 18.5409 11.0983 18.5747 10.9497L20.6867 2.69883C20.707 2.60056 20.7043 2.49901 20.6789 2.40191C20.6535 2.30482 20.6061 2.21474 20.5402 2.13853Z" fill="white"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    
-        container.querySelectorAll('.btn-buy').forEach(btn => {
-            btn.addEventListener('click', (e) => e.stopPropagation());
-        });
-    
-        container.querySelectorAll('.btn-cart').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const productCard = e.target.closest('.product-card');
-                const comparisonBtn = productCard.querySelector('.comparison-btn');
-                const productId = comparisonBtn.dataset.productId;
-                
-                if (!productId) {
-                    console.error('Product ID not found');
-                    return;
-                }
-                
-                try {
-                    const addResponse = await fetch('../api/add_to_cart.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ product_id: productId })
-                    });
-                    
-                    const addResult = await addResponse.json();
-                    
-                    if (addResult.status === 'success') {
-                        await loadUserData();
-                        dispatchCounterUpdateEvent();
-                        showNotification(addResult.message);
-                        animateCartButton(btn);
-                    } else {
-                        showNotification(addResult.message, 'error');
-                    }
-                } catch (error) {
-                    console.error('Ошибка при работе с корзиной:', error);
-                    showNotification('Произошла ошибка', 'error');
-                }
-            });
-        });
-    
-        container.querySelectorAll('.favorite-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const productId = btn.dataset.productId;
-                
-                try {
-                    const response = await fetch('../api/add_to_favorite.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ product_id: productId })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        btn.classList.toggle('active');
-                        const icon = btn.querySelector('svg path');
-                        icon.setAttribute('fill', btn.classList.contains('active') ? '#8A33FD' : '#C8CACB');
-                        
-                        await loadUserData();
-                        dispatchCounterUpdateEvent();
-                    }
-                } catch (error) {
-                    console.error('Ошибка при добавлении в избранное:', error);
-                    showNotification('Произошла ошибка', 'error');
-                }
-            });
-        });
-    
-        container.querySelectorAll('.comparison-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const productId = btn.dataset.productId;
-                const wasActive = btn.classList.contains('active');
-        
-                btn.classList.toggle('active', !wasActive);
-                const icon = btn.querySelector('svg path');
-                if (icon) {
-                    icon.style.fill = !wasActive ? '#8A33FD' : '#C8CACB';
-                }
-        
-                try {
-                    await fetch('../api/add_to_comparison.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify({ product_id: productId })
-                    });
-        
-                    await loadUserData();
-                    dispatchCounterUpdateEvent();
-        
-                    const isActuallyCompared = window.userData.comparisons.some(
-                        item => item.product_id == productId
-                    );
-        
-                    if (isActuallyCompared !== !wasActive) {
-                        btn.classList.toggle('active');
-                        if (icon) {
-                            icon.style.fill = isActuallyCompared ? '#8A33FD' : '#C8CACB';
-                        }
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    btn.classList.toggle('active', wasActive);
-                    if (icon) {
-                        icon.style.fill = wasActive ? '#8A33FD' : '#C8CACB';
-                    }
-                    showNotification('Произошла ошибка', 'error');
-                }
-            });
-        });
-    
-        container.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                if (e.target === card || card.contains(e.target)) {
-                    const isButtonClick = e.target.closest('.btn-buy, .btn-cart, .favorite-btn, .comparison-btn');
-                    if (!isButtonClick) {
-                        const productId = card.querySelector('.favorite-btn').dataset.productId;
-                        // Передаем текущий URL как параметр referrer
-                        const currentUrl = encodeURIComponent(window.location.href);
-                        window.location.href = `../product.php?id=${productId}&referrer=${currentUrl}`;
-                    }
-                }
-            });
-        });
-    }
-
-    function animateCartButton(button) {
-        button.classList.add('animate');
-        setTimeout(() => {
-            button.classList.remove('animate');
-        }, 1000);
-    }
-
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
-    }
-
-    initFilters();
-});
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
