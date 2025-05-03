@@ -199,21 +199,7 @@
             position: relative;
             display: inline-block;
         }
-        #cart-counter, #comparison-counter {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #4E1E6D;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
+        
     </style>
 </head>
 <body>

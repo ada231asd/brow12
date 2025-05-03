@@ -99,33 +99,6 @@
             });
         });
 
-       // Проверка активной сессии при загрузке страницы
-       document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('../api/auth.php?action=check');
-                const result = await response.json();
-                if (result.status === 'success') {
-                    redirectToRolePage(result.user.role);
-                }
-            } catch (error) {
-                console.log('Пользователь не авторизован');
-            }
-        });
-
-        // Функция перенаправления по ролям
-        function redirectToRolePage(role) {
-            switch(role) {
-                case 'admin':
-                    window.location.href = '../cab/admin/admin.php';
-                    break;
-                case 'manager':
-                    window.location.href = '../cab/polzovatel/polzovatel.php';
-                    break;
-                default:
-                    window.location.href = 'catalog copy.php';
-            }
-        }
-
         // Обработка форм
         async function handleFormSubmit(form, action) {
             const formData = new FormData(form);
@@ -140,13 +113,17 @@
                 });
 
                 const result = await response.json();
-                
                 if (result.status === 'success') {
-                    // Перенаправляем в зависимости от роли
-                    redirectToRolePage(result.user.role);
-                } else {
-                    errorElement.textContent = result.message;
-                }
+    const roleId = String(result.user.role); // Приводим к строке для надёжного сравнения
+
+    if (roleId === '1') {
+        window.location.href = '../../admin/admin.php';
+    } else if (roleId === '2') {
+        window.location.href = '../../cab';
+    } else {
+        window.location.href = 'catalog copy.php'; // запасной вариант
+    }
+}
             } catch (error) {
                 errorElement.textContent = 'Ошибка соединения';
             }
