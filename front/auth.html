@@ -5,73 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизация/Регистрация</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
         .auth-container {
             max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            padding: 30px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 10px;
         }
-        .form-toggle {
+        .form-header {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
-        .toggle-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: #eee;
-            cursor: pointer;
+        .form-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
         }
-        .toggle-btn.active {
-            background: #007bff;
-            color: white;
+        .close-btn {
+            color: #ff4d4d;
+            font-size: 24px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .close-btn:hover {
+            color: #e60000;
         }
         .auth-form {
-            display: none;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: opacity 0.3s ease, height 0.3s ease;
         }
         .auth-form.active {
-            display: block;
+            opacity: 1;
+            height: auto;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            position: relative;
         }
         input {
             width: 100%;
-            padding: 8px;
+            padding: 10px 10px 10px 40px;
             margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .password-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 16px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #007bff;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        .toggle-password:hover {
+            color: #0056b3;
         }
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: #28a745;
             color: white;
             border: none;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #218838;
         }
         .error {
-            color: red;
+            color: #ff4d4d;
             margin-top: 10px;
+            font-size: 14px;
+            transition: opacity 0.3s ease;
+        }
+        input[type="hidden"] {
+            display: none;
+        }
+        .switch-form {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .switch-form a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .switch-form a:hover {
+            color: #0056b3;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="auth-container">
-        <div class="form-toggle">
-            <button class="toggle-btn active" data-form="login">Вход</button>
-            <button class="toggle-btn" data-form="register">Регистрация</button>
-        </div>
-
         <form id="loginForm" class="auth-form active">
+            <div class="form-header">
+                <h2>Вход</h2>
+                <a href="/" class="close-btn">×</a>
+            </div>
             <div class="form-group">
+                <span class="password-icon">🔒</span>
                 <input type="email" name="email" placeholder="Email" required>
             </div>
             <div class="form-group">
-                <input type="password" name="password" placeholder="Пароль" required>
+                <span class="password-icon">🔒</span>
+                <input type="password" name="password" id="loginPassword" placeholder="Пароль" required>
+                <span class="toggle-password" id="toggleLoginPassword">👁</span>
             </div>
+            <input type="hidden" name="csrf_token" id="csrf_token">
             <button type="submit">Войти</button>
+            <div class="error" id="errorMessage"></div>
+            <div class="switch-form">
+                <a href="#" id="switchToRegister">Нет аккаунта? Зарегистрируйся</a>
+            </div>
         </form>
 
         <form id="registerForm" class="auth-form">
+            <div class="form-header">
+                <h2>Регистрация</h2>
+                <a href="/" class="close-btn">×</a>
+            </div>
             <div class="form-group">
                 <input type="text" name="name" placeholder="Имя" required>
             </div>
@@ -79,53 +167,159 @@
                 <input type="email" name="email" placeholder="Email" required>
             </div>
             <div class="form-group">
-                <input type="password" name="password" placeholder="Пароль" required>
+                <input type="tel" name="phone" id="phone" placeholder="Номер телефона">
             </div>
+            <div class="form-group">
+                <span class="password-icon">🔒</span>
+                <input type="password" name="password" id="registerPassword" placeholder="Пароль" required>
+                <span class="toggle-password" id="toggleRegisterPassword">👁</span>
+                <div class="error" id="passwordHint"></div>
+            </div>
+            <input type="hidden" name="csrf_token" id="register_csrf_token">
             <button type="submit">Зарегистрироваться</button>
+            <div class="error" id="errorMessage"></div>
+            <div class="switch-form">
+                <a href="#" id="switchToLogin">Уже есть аккаунт? Войди</a>
+            </div>
         </form>
-
-        <div class="error" id="errorMessage"></div>
     </div>
 
     <script>
-        // Переключение форм
-        document.querySelectorAll('.toggle-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.toggle-btn, .auth-form').forEach(el => {
-                    el.classList.remove('active');
+        // Получение CSRF-токена с сервера
+        async function fetchCsrfToken() {
+            try {
+                const response = await fetch('../api/auth.php?action=check', {
+                    method: 'GET',
+                    credentials: 'include'
                 });
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.form + 'Form').classList.add('active');
-            });
+                const text = await response.text();
+                const result = JSON.parse(text);
+                if (result.status === 'success') {
+                    return result.csrf_token || null;
+                }
+                return null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Установка CSRF-токена
+        (async () => {
+            const csrfToken = await fetchCsrfToken();
+            if (csrfToken) {
+                document.getElementById('csrf_token').value = csrfToken;
+                document.getElementById('register_csrf_token').value = csrfToken;
+            } else {
+                const localToken = btoa(Math.random().toString(36).substring(2, 15) + Date.now());
+                document.getElementById('csrf_token').value = localToken;
+                document.getElementById('register_csrf_token').value = localToken;
+            }
+        })();
+
+        // Переключение форм
+        document.getElementById('switchToRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.auth-form').forEach(el => el.classList.remove('active'));
+            document.getElementById('registerForm').classList.add('active');
         });
+
+        document.getElementById('switchToLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.auth-form').forEach(el => el.classList.remove('active'));
+            document.getElementById('loginForm').classList.add('active');
+        });
+
+        // Переключение видимости пароля
+        document.getElementById('toggleLoginPassword').addEventListener('click', () => {
+            const password = document.getElementById('loginPassword');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            document.getElementById('toggleLoginPassword').textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+        });
+
+        document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
+            const password = document.getElementById('registerPassword');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            document.getElementById('toggleRegisterPassword').textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+        });
+
+        // Маска для номера телефона
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 1) {
+                value = value.substring(1);
+            }
+            if (value.length > 0) {
+                let formatted = '+7';
+                if (value.length > 0) formatted += ' (' + value.substring(0, 3);
+                if (value.length >= 3) formatted += ') ' + value.substring(3, 6);
+                if (value.length >= 6) formatted += '-' + value.substring(6, 8);
+                if (value.length >= 8) formatted += '-' + value.substring(8, 10);
+                e.target.value = formatted;
+            } else {
+                e.target.value = '';
+            }
+        });
+
+        let loginAttempts = 0;
 
         // Обработка форм
         async function handleFormSubmit(form, action) {
             const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
             const errorElement = document.getElementById('errorMessage');
+            const passwordHint = document.getElementById('passwordHint');
+
+            if (action === 'register') {
+                const password = data.password;
+                const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{6,})/;
+                if (!passwordRegex.test(password)) {
+                    passwordHint.textContent = 'Пароль должен содержать минимум 6 символов, 1 заглавную букву и 1 спецсимвол (!@#$%^&*)';
+                    return;
+                }
+                passwordHint.textContent = '';
+            }
+
+            if (action === 'login') {
+                loginAttempts++;
+                if (loginAttempts === 2) {
+                    errorElement.textContent = 'Следующая попытка приведет к блокировке аккаунта';
+                }
+            }
 
             try {
-                const response = await fetch(`../api/auth.php?action=${action}`, {
+                const response = await fetch('../api/auth.php?action=' + action, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
+                    credentials: 'include',
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
+                const text = await response.text();
+                const result = JSON.parse(text);
                 if (result.status === 'success') {
-    const roleId = String(result.user.role); // Приводим к строке для надёжного сравнения
-
-    if (roleId === '1') {
-        window.location.href = '../../admin/admin.php';
-    } else if (roleId === '2') {
-        window.location.href = '../../cab';
-    } else {
-        window.location.href = 'catalog copy.php'; // запасной вариант
-    }
-}
+                    loginAttempts = 0;
+                    errorElement.textContent = '';
+                    const roleId = String(result.user ? result.user.role : '2');
+                    if (action === 'register') {
+                        window.location.href = '/auth.html';
+                    } else if (roleId === '1') {
+                        window.location.href = '../../admin/admin.php';
+                    } else if (roleId === '2') {
+                        window.location.href = '../../cab';
+                    } else {
+                        window.location.href = 'catalog copy.php';
+                    }
+                } else {
+                    errorElement.textContent = result.message;
+                }
             } catch (error) {
-                errorElement.textContent = 'Ошибка соединения';
+                errorElement.textContent = 'Ошибка соединения: ' + error.message;
             }
         }
 

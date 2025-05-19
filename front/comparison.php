@@ -1,3 +1,11 @@
+<?php
+
+// Проверка авторизации через куки
+if (!isset($_COOKIE['auth_token'])) {
+    header("Location: auth.html");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>

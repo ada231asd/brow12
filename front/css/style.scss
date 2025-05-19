@@ -58,7 +58,8 @@ header{
         align-items: center;
         margin-left: 310px;
         gap: 8px;
-        p{
+        font-size: 12px;
+        h1{
             color: white;
             font-family: $space;
             font-size: 24px;
@@ -110,48 +111,48 @@ header{
 
 }
 
-.hed_down{
-    height: 60px;
-    width: 1920px;
-    background-color: #1B0E21;
-    display: flex;
-    .cat{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        background-color: #390054;
-        width: 310px;
-        margin-left: 310px;
+// .hed_down{
+//     height: 60px;
+//     width: 1920px;
+//     background-color: #1B0E21;
+//     display: flex;
+//     .cat{
+//         display: flex;
+//         justify-content: center;
+//         align-items: center;
+//         gap: 10px;
+//         background-color: #390054;
+//         width: 310px;
+//         margin-left: 310px;
 
-        img{
-            width: 32px;
-            height: 32px;
-        }
-        p{
-            a{
-             color: white;
-            font-family: $exo2;
-            font-size: 16xp;   
-            }
+//         img{
+//             width: 32px;
+//             height: 32px;
+//         }
+//         p{
+//             a{
+//              color: white;
+//             font-family: $exo2;
+//             font-size: 16xp;   
+//             }
             
-        }
-    }
-    .nav{
-        display: flex;
-        ul{
-            display: flex;
-            li{
-               a{ 
-                color: white;
-                font-family: $exo2;
-                font-size: 16px;
-                gap: 40px;
-                margin-left: 24px;
-               }}
-        }
-    }
-}
+//         }
+//     }
+//     .nav{
+//         display: flex;
+//         ul{
+//             display: flex;
+//             li{
+//                a{ 
+//                 color: white;
+//                 font-family: $exo2;
+//                 font-size: 16px;
+//                 gap: 40px;
+//                 margin-left: 24px;
+//                }}
+//         }
+//     }
+// }
 footer{
 position: relative;
 margin-top: auto;

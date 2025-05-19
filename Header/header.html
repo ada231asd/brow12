@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DimTech</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/brow12/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/brow12/css/sh.css">
     <style>
         .comparison-link, .cart-icon {
             position: relative;
@@ -56,10 +57,10 @@
 </head>
 <body>
     <header>
-        <div class="hed_top" >
-                <div class="logo" onclick="redirectToHome()">
-                <p>DIM</p>
-                <p id="TECH">TECH</p>
+        <div class="hed_top">
+            <div class="logo" onclick="redirectToHome()" style="font-family:'SPACE ARMOR Regular'; font-size: 12px;">
+                <h1>DIM</h1>
+                <h1 id="TECH">TECH</h1>
             </div>
             
             <div class="con">
@@ -78,7 +79,7 @@
                 </div>
             </div>
             <div class="prof">
-                <a href="../../cab/index.php" class="profile-link">
+                <a href="/../cab/index.php" class="profile-link" id="profile-link">
                     <img id="profile-icon" src="/../brow12/img/profil.svg" alt="Профиль" class="profile-img">
                     <span id="auth-indicator" class="auth-indicator" style="display: none;"></span>
                 </a>
@@ -150,6 +151,11 @@
                 // Индикатор авторизации
                 const authIndicator = document.getElementById('auth-indicator');
                 authIndicator.style.display = 'block';
+        
+                // Перенаправление в зависимости от роли
+                const profileLink = document.getElementById('profile-link');
+                const roleId = userData.user.role_id;
+                profileLink.href = roleId === 2 ? '/cab/index.php' : '/admin/admin.php';
             }
         
             function resetHeader() {
@@ -157,6 +163,7 @@
                 document.getElementById('comparison-counter').style.display = 'none';
                 document.getElementById('profile-icon').src = '/../brow12/img/profil.svg';
                 document.getElementById('auth-indicator').style.display = 'none';
+                document.getElementById('profile-link').href = '/cab/index.php';
             }
         
             // Подписка на событие обновления счетчиков
@@ -174,6 +181,6 @@
         
             fetchUserData();
         });
-        </script>
+    </script>
 </body>
 </html>

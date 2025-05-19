@@ -1,9 +1,9 @@
 <?php
-// db.php
-$host = 'localhost'; // Хост базы данных
-$dbname = 'pk_st'; // Имя базы данных ComputerStore
-$username = 'root'; // Имя пользователя базы данных
-$password = ''; // Пароль к базе данных (если есть)
+
+$host = 'localhost'; 
+$dbname = 'pk_st'; 
+$username = 'root'; 
+$password = ''; 
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);

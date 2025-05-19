@@ -28,6 +28,7 @@
   position: absolute;
   left: 310px;
   top: 0px;
+  margin-top:20px;
 }
 .dim-tech {
   color: #ffffff;

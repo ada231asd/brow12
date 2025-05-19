@@ -1,3 +1,11 @@
+<?php
+
+// Проверка авторизации через куки
+if (!isset($_COOKIE['auth_token'])) {
+    header("Location: auth.html");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -299,7 +307,7 @@ class UserData {
             });
             
             if (response.status === 401) {
-                window.location.href = '/login.php';
+                window.location.href = 'auth.html';
                 throw new Error('Требуется авторизация');
             }
             
