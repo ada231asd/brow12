@@ -7,127 +7,168 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background: #181818;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
         }
         .auth-container {
-            max-width: 400px;
-            width: 100%;
-            padding: 30px;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: #181818;
             border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            width: 350px;
+            padding: 0;
         }
         .form-header {
+            background: #2d014d;
+            border-radius: 10px 10px 0 0;
+            padding: 18px 24px 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
         }
         .form-header h2 {
+            color: #fff;
+            font-size: 20px;
             margin: 0;
-            color: #333;
-            font-size: 24px;
         }
         .close-btn {
             color: #ff4d4d;
-            font-size: 24px;
+            font-size: 22px;
             text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        .close-btn:hover {
-            color: #e60000;
+            cursor: pointer;
         }
         .auth-form {
-            opacity: 0;
-            height: 0;
-            overflow: hidden;
-            transition: opacity 0.3s ease, height 0.3s ease;
+            display: none;
+            padding: 24px;
         }
         .auth-form.active {
-            opacity: 1;
-            height: auto;
+            display: block;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             position: relative;
         }
-        input {
-            width: 100%;
-            padding: 10px 10px 10px 40px;
-            margin-top: 5px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
+        label {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 4px;
+            display: block;
         }
-        input:focus {
-            border-color: #007bff;
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"] {
+            width: 85%;
+            padding: 10px 36px 10px 12px;
+            background: #181818;
+            border: 2px solid #6c2eb7;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 15px;
             outline: none;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="tel"]:focus {
+            border: 2px solid #a259ff;
         }
         .password-icon {
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            color: #666;
+            color: #a259ff;
             font-size: 16px;
         }
         .toggle-password {
             position: absolute;
-            right: 12px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #007bff;
+            color: #a259ff;
             font-size: 16px;
-            transition: color 0.3s ease;
         }
-        .toggle-password:hover {
-            color: #0056b3;
+        .forgot-link {
+            color: #a259ff;
+            font-size: 13px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+        .forgot-link:hover {
+            color: #fff;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            accent-color: #a259ff;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+        }
+        .checkbox-group label {
+            color: #fff;
+            font-size: 14px;
+            margin: 0;
+            cursor: pointer;
         }
         button {
             width: 100%;
             padding: 12px;
-            background: #28a745;
-            color: white;
+            background: #6c2eb7;
+            color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s ease;
+            margin-top: 8px;
+            transition: background 0.2s;
         }
         button:hover {
-            background: #218838;
-        }
-        .error {
-            color: #ff4d4d;
-            margin-top: 10px;
-            font-size: 14px;
-            transition: opacity 0.3s ease;
-        }
-        input[type="hidden"] {
-            display: none;
+            background: #a259ff;
         }
         .switch-form {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 18px;
         }
         .switch-form a {
-            color: #007bff;
+            color: #a259ff;
             text-decoration: none;
             font-size: 14px;
-            transition: color 0.3s ease;
+            transition: color 0.2s;
         }
         .switch-form a:hover {
-            color: #0056b3;
+            color: #fff;
+        }
+        .error {
+            color: #ff4d4d;
+            margin-top: 8px;
+            font-size: 13px;
+            min-height: 18px;
+        }
+        .user-agreement {
+            color: #bdbdbd;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .user-agreement a {
+            color: #a259ff;
             text-decoration: underline;
+        }
+        .user-agreement a:hover {
+            color: #fff;
         }
     </style>
 </head>
@@ -135,51 +176,62 @@
     <div class="auth-container">
         <form id="loginForm" class="auth-form active">
             <div class="form-header">
-                <h2>Вход</h2>
-                <a href="/" class="close-btn">×</a>
+                <span style="font-size:18px;color:#fff;">Вход</span>
+                <a href="#" class="close-btn" onclick="window.location.href='/'">×</a>
             </div>
             <div class="form-group">
-                <span class="password-icon">🔒</span>
-                <input type="email" name="email" placeholder="Email" required>
+                <label for="loginEmail">Эл. почта или телефон</label>
+                <input type="text" name="email" id="loginEmail" placeholder="Введите email или телефон" required>
             </div>
             <div class="form-group">
-                <span class="password-icon">🔒</span>
-                <input type="password" name="password" id="loginPassword" placeholder="Пароль" required>
+                <label for="loginPassword">Пароль</label>
+                <input type="password" name="password" id="loginPassword" placeholder="Введите пароль" required>
                 <span class="toggle-password" id="toggleLoginPassword">👁</span>
+            </div>
+            <a href="#" class="forgot-link">Забыли пароль?</a>
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMe" name="remember_me">
+                <label for="rememberMe">Запомнить меня</label>
             </div>
             <input type="hidden" name="csrf_token" id="csrf_token">
             <button type="submit">Войти</button>
             <div class="error" id="errorMessage"></div>
             <div class="switch-form">
-                <a href="#" id="switchToRegister">Нет аккаунта? Зарегистрируйся</a>
+                <a href="#" id="switchToRegister">Зарегистрироваться</a>
             </div>
         </form>
 
         <form id="registerForm" class="auth-form">
             <div class="form-header">
-                <h2>Регистрация</h2>
-                <a href="/" class="close-btn">×</a>
+                <span style="font-size:18px;color:#fff;">Регистрация</span>
+                <a href="#" class="close-btn" onclick="window.location.href='/'">×</a>
             </div>
             <div class="form-group">
-                <input type="text" name="name" placeholder="Имя" required>
+                <label for="registerName">Имя</label>
+                <input type="text" name="name" id="registerName" placeholder="Введите имя" required>
             </div>
             <div class="form-group">
-                <input type="email" name="email" placeholder="Email" required>
+                <label for="registerEmail">Эл. почта</label>
+                <input type="email" name="email" id="registerEmail" placeholder="Введите email" required>
             </div>
             <div class="form-group">
-                <input type="tel" name="phone" id="phone" placeholder="Номер телефона">
+                <label for="phone">Номер телефона</label>
+                <input type="tel" name="phone" id="phone" placeholder="+7 (___) ___-__-__">
             </div>
             <div class="form-group">
-                <span class="password-icon">🔒</span>
-                <input type="password" name="password" id="registerPassword" placeholder="Пароль" required>
+                <label for="registerPassword">Придумайте пароль</label>
+                <input type="password" name="password" id="registerPassword" placeholder="Введите пароль" required>
                 <span class="toggle-password" id="toggleRegisterPassword">👁</span>
                 <div class="error" id="passwordHint"></div>
             </div>
+            <div class="user-agreement">
+                Регистрируясь, вы соглашаетесь с <a href="#" target="_blank">пользовательским соглашением</a>.
+            </div>
             <input type="hidden" name="csrf_token" id="register_csrf_token">
             <button type="submit">Зарегистрироваться</button>
-            <div class="error" id="errorMessage"></div>
+            <div class="error" id="registerErrorMessage"></div>
             <div class="switch-form">
-                <a href="#" id="switchToLogin">Уже есть аккаунт? Войди</a>
+                <a href="#" id="switchToLogin">Я уже зарегистрирован</a>
             </div>
         </form>
     </div>
@@ -222,7 +274,6 @@
             document.querySelectorAll('.auth-form').forEach(el => el.classList.remove('active'));
             document.getElementById('registerForm').classList.add('active');
         });
-
         document.getElementById('switchToLogin').addEventListener('click', (e) => {
             e.preventDefault();
             document.querySelectorAll('.auth-form').forEach(el => el.classList.remove('active'));
@@ -234,14 +285,13 @@
             const password = document.getElementById('loginPassword');
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
-            document.getElementById('toggleLoginPassword').textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+            document.getElementById('toggleLoginPassword').textContent = type === 'password' ? '👁' : '👁️‍🗨️';
         });
-
         document.getElementById('toggleRegisterPassword').addEventListener('click', () => {
             const password = document.getElementById('registerPassword');
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
-            document.getElementById('toggleRegisterPassword').textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+            document.getElementById('toggleRegisterPassword').textContent = type === 'password' ? '👁' : '👁️‍🗨️';
         });
 
         // Маска для номера телефона
@@ -272,7 +322,11 @@
             for (let [key, value] of formData.entries()) {
                 data[key] = value;
             }
-            const errorElement = document.getElementById('errorMessage');
+            // Для чекбокса remember_me
+            if (form.id === 'loginForm') {
+                data['remember_me'] = document.getElementById('rememberMe').checked ? 1 : 0;
+            }
+            const errorElement = form.id === 'loginForm' ? document.getElementById('errorMessage') : document.getElementById('registerErrorMessage');
             const passwordHint = document.getElementById('passwordHint');
 
             if (action === 'register') {
@@ -299,7 +353,6 @@
                     credentials: 'include',
                     body: JSON.stringify(data)
                 });
-
                 const text = await response.text();
                 const result = JSON.parse(text);
                 if (result.status === 'success') {
@@ -307,7 +360,7 @@
                     errorElement.textContent = '';
                     const roleId = String(result.user ? result.user.role : '2');
                     if (action === 'register') {
-                        window.location.href = '/auth.html';
+                        window.location.href = 'auth.html';
                     } else if (roleId === '1') {
                         window.location.href = '../../admin/admin.php';
                     } else if (roleId === '2') {
@@ -327,7 +380,6 @@
             e.preventDefault();
             handleFormSubmit(e.target, 'login');
         });
-
         document.getElementById('registerForm').addEventListener('submit', e => {
             e.preventDefault();
             handleFormSubmit(e.target, 'register');

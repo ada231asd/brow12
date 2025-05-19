@@ -59,8 +59,9 @@ header {
   align-items: center;
   margin-left: 310px;
   gap: 8px;
+  font-size: 12px;
 }
-.hed_top .logo p {
+.hed_top .logo h1 {
   color: white;
   font-family: "SPACE ARMOR", sans-serif;
   font-size: 24px;
@@ -105,44 +106,6 @@ header {
 .hed_top .prof img {
   width: 20px;
   height: 18px;
-}
-
-.hed_down {
-  height: 60px;
-  width: 1920px;
-  background-color: #1B0E21;
-  display: flex;
-}
-.hed_down .cat {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  background-color: #390054;
-  width: 310px;
-  margin-left: 310px;
-}
-.hed_down .cat img {
-  width: 32px;
-  height: 32px;
-}
-.hed_down .cat p a {
-  color: white;
-  font-family: "Exo 2", sans-serif;
-  font-size: 16xp;
-}
-.hed_down .nav {
-  display: flex;
-}
-.hed_down .nav ul {
-  display: flex;
-}
-.hed_down .nav ul li a {
-  color: white;
-  font-family: "Exo 2", sans-serif;
-  font-size: 16px;
-  gap: 40px;
-  margin-left: 24px;
 }
 
 footer {
