@@ -436,9 +436,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `).join('');
-    
+
         container.querySelectorAll('.btn-buy').forEach(btn => {
-            btn.addEventListener('click', (e) => e.stopPropagation());
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showModal('Функция "Купить в 1 клик" будет реализована в ближайшее время');
+            });
         });
     
         container.querySelectorAll('.btn-cart').forEach(btn => {
@@ -590,6 +594,41 @@ document.addEventListener('DOMContentLoaded', () => {
         notification.textContent = message;
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
+    }
+
+    // Добавляем глобальный обработчик для кнопки "Купить в один клик"
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-buy')) {
+            e.preventDefault();
+            e.stopPropagation();
+            showModal('Функция "Купить в 1 клик" будет реализована в ближайшее время');
+        }
+    });
+
+    function showModal(message) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <p>${message}</p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeBtn = modal.querySelector('.close-btn');
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            modal.remove();
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                modal.remove();
+            }
+        });
     }
 
     initFilters();

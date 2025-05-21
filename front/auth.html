@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизация/Регистрация</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -177,7 +178,7 @@
         <form id="loginForm" class="auth-form active">
             <div class="form-header">
                 <span style="font-size:18px;color:#fff;">Вход</span>
-                <a href="#" class="close-btn" onclick="window.location.href='/'">×</a>
+                <a href="#" class="close-btn" onclick="window.location.href='../'">×</a>
             </div>
             <div class="form-group">
                 <label for="loginEmail">Эл. почта или телефон</label>
@@ -193,6 +194,7 @@
                 <input type="checkbox" id="rememberMe" name="remember_me">
                 <label for="rememberMe">Запомнить меня</label>
             </div>
+            <div class="g-recaptcha" data-sitekey="6LdTfkIrAAAAAG83DcwWCkUa21zCBBu8Icb1Hq-4"></div>
             <input type="hidden" name="csrf_token" id="csrf_token">
             <button type="submit">Войти</button>
             <div class="error" id="errorMessage"></div>
@@ -204,7 +206,7 @@
         <form id="registerForm" class="auth-form">
             <div class="form-header">
                 <span style="font-size:18px;color:#fff;">Регистрация</span>
-                <a href="#" class="close-btn" onclick="window.location.href='/'">×</a>
+                <a href="#" class="close-btn" onclick="window.location.href='../'">×</a>
             </div>
             <div class="form-group">
                 <label for="registerName">Имя</label>
@@ -227,6 +229,7 @@
             <div class="user-agreement">
                 Регистрируясь, вы соглашаетесь с <a href="#" target="_blank">пользовательским соглашением</a>.
             </div>
+            <div class="g-recaptcha" data-sitekey="6LdTfkIrAAAAAG83DcwWCkUa21zCBBu8Icb1Hq-4"></div>
             <input type="hidden" name="csrf_token" id="register_csrf_token">
             <button type="submit">Зарегистрироваться</button>
             <div class="error" id="registerErrorMessage"></div>
@@ -322,9 +325,23 @@
             for (let [key, value] of formData.entries()) {
                 data[key] = value;
             }
+
+            // Проверка reCAPTCHA
+            const recaptchaResponse = grecaptcha.getResponse();
+            if (!recaptchaResponse) {
+                const errorElement = form.id === 'loginForm' ? document.getElementById('errorMessage') : document.getElementById('registerErrorMessage');
+                errorElement.textContent = 'Пожалуйста, подтвердите, что вы не робот';
+                return;
+            }
+            data['g-recaptcha-response'] = recaptchaResponse;
+
             // Для чекбокса remember_me
             if (form.id === 'loginForm') {
                 data['remember_me'] = document.getElementById('rememberMe').checked ? 1 : 0;
+            }
+            // Преобразование номера телефона в формат +7XXXXXXXXXX
+            if (data.phone) {
+                data.phone = '+7' + data.phone.replace(/\D/g, '').substring(1);
             }
             const errorElement = form.id === 'loginForm' ? document.getElementById('errorMessage') : document.getElementById('registerErrorMessage');
             const passwordHint = document.getElementById('passwordHint');

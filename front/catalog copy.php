@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -67,6 +66,42 @@
         .notification.info {
             background-color: #141414;
         }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +169,54 @@
 <?php require '../Foter/foter.html';?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
 <script src="js/script.js"></script>
+<script>
+// Функция для отображения модального окна
+function showModal(message) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Информация</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close-btn">Закрыть</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Добавляем обработчики для закрытия модального окна
+    const closeButtons = modal.querySelectorAll('.close-modal, .modal-close-btn');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            modal.classList.add('fade-out');
+            setTimeout(() => modal.remove(), 300);
+        });
+    });
+
+    // Закрытие по клику вне модального окна
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('fade-out');
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+}
+
+// Модифицируем обработчик кнопки "Купить в 1 клик"
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-buy')) {
+        e.preventDefault();
+        e.stopPropagation();
+        showModal('Функция "Купить в 1 клик" будет реализована в ближайшее время');
+    }
+});
+</script>
 </body>
 
 </html>

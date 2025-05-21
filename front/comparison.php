@@ -261,7 +261,7 @@ if (!isset($_COOKIE['auth_token'])) {
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    if (data.data.products.length === 0) {
+                    if (!data.data || !data.data.products || data.data.products.length === 0) {
                         emptyMessage.style.display = 'block';
                         comparisonTable.style.display = 'none';
                         return;

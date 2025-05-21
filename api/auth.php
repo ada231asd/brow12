@@ -14,6 +14,29 @@ if (!isset($_SESSION['csrf_token'])) {
 
 $response = ['status' => 'error', 'message' => 'Неизвестная ошибка'];
 
+function verifyRecaptcha($recaptchaResponse) {
+    $secretKey = "6LdTfkIrAAAAABgSLyBnjNs8YzVuPq5jvBj2yHRr";
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $data = [
+        'secret' => $secretKey,
+        'response' => $recaptchaResponse
+    ];
+
+    $options = [
+        'http' => [
+            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method' => 'POST',
+            'content' => http_build_query($data)
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $response = file_get_contents($url, false, $context);
+    $result = json_decode($response);
+
+    return $result->success;
+}
+
 try {
     $action = $_GET['action'] ?? '';
 
@@ -28,6 +51,13 @@ try {
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
+        
+        // Проверка reCAPTCHA
+        if (!isset($data['g-recaptcha-response']) || !verifyRecaptcha($data['g-recaptcha-response'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Пожалуйста, подтвердите, что вы не робот']);
+            exit;
+        }
+
         if (is_null($data)) {
             $response['message'] = 'Ошибка парсинга данных';
         } elseif ($action !== 'check' && isset($data['csrf_token']) && $data['csrf_token'] !== $_SESSION['csrf_token']) {

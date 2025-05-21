@@ -272,7 +272,11 @@ async function loadUserData() {
 function setupEventListeners(container) {
     // Обработчики для кнопок покупки и корзины
     container.querySelectorAll('.btn-buy').forEach(btn => {
-        btn.addEventListener('click', (e) => e.stopPropagation());
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            showModal('Функция "Купить в 1 клик" будет реализована в ближайшее время');
+        });
     });
 
     container.querySelectorAll('.btn-cart').forEach(btn => {
@@ -394,7 +398,7 @@ function setupEventListeners(container) {
                 if (icon) {
                     icon.style.fill = wasActive ? '#8A33FD' : '#C8CACB';
                 }
-                showNotification('Произошла ошибка', 'error');
+                showNotification('Доступ запрещен: требуется авторизация', 'error');
             }
         });
     });
@@ -453,7 +457,182 @@ async function loadProducts(params, containerId, favoriteIds = [], comparisonIds
         showNotification('Произошла ошибка при загрузке', 'error');
     }
 }
-    </script>
+
+// Функция для проверки авторизации
+async function checkAuth() {
+    try {
+        const response = await fetch('/../brow12/api/get_full_user.php', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.status !== 'success') {
+            showAuthNotification();
+            disableInteractiveElements();
+        }
+    } catch (error) {
+        console.error('Ошибка проверки авторизации:', error);
+        showAuthNotification();
+        disableInteractiveElements();
+    }
+}
+
+// Функция для отображения уведомления об авторизации
+function showAuthNotification() {
+    const notification = document.createElement('div');
+    notification.className = 'auth-notification';
+    notification.innerHTML = `
+        <div class="notification-content">
+          
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => notification.remove(), 500);
+    }, 5000);
+}
+
+// Функция для отключения интерактивных элементов
+function disableInteractiveElements() {
+    const interactiveElements = document.querySelectorAll('.btn-buy, .btn-cart, .favorite-btn, .comparison-btn');
+    interactiveElements.forEach(element => {
+        element.style.pointerEvents = 'none';
+        element.style.opacity = '0.5';
+    });
+}
+
+// Функция для отображения модального окна
+function showModal(message) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Информация</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close-btn">Закрыть</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Добавляем обработчики для закрытия модального окна
+    const closeButtons = modal.querySelectorAll('.close-modal, .modal-close-btn');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            modal.classList.add('fade-out');
+            setTimeout(() => modal.remove(), 300);
+        });
+    });
+
+    // Закрытие по клику вне модального окна
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('fade-out');
+            setTimeout(() => modal.remove(), 300);
+        }
+    });
+}
+
+// Добавляем стили для модального окна
+const modalStyle = document.createElement('style');
+modalStyle.textContent = `
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .modal-body {
+        padding: 20px;
+        color: #333;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #eee;
+        text-align: right;
+    }
+
+    .modal-close-btn {
+        background-color: #8A33FD;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .modal-close-btn:hover {
+        background-color: #7A23ED;
+    }
+
+    .modal.fade-out {
+        animation: fadeOut 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(modalStyle);
+
+// Проверяем авторизацию при загрузке страницы
+window.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+});
+</script>
     <script src="js/slider.js"></script>
 </body>
 </html>
