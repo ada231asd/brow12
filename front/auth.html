@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизация/Регистрация</title>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        // Функция обратного вызова для reCAPTCHA
+        function onRecaptchaLoad() {
+            console.log('reCAPTCHA загружена');
+        }
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -229,7 +235,6 @@
             <div class="user-agreement">
                 Регистрируясь, вы соглашаетесь с <a href="#" target="_blank">пользовательским соглашением</a>.
             </div>
-            <div class="g-recaptcha" data-sitekey="6LdTfkIrAAAAAG83DcwWCkUa21zCBBu8Icb1Hq-4"></div>
             <input type="hidden" name="csrf_token" id="register_csrf_token">
             <button type="submit">Зарегистрироваться</button>
             <div class="error" id="registerErrorMessage"></div>
@@ -326,14 +331,17 @@
                 data[key] = value;
             }
 
-            // Проверка reCAPTCHA
-            const recaptchaResponse = grecaptcha.getResponse();
-            if (!recaptchaResponse) {
-                const errorElement = form.id === 'loginForm' ? document.getElementById('errorMessage') : document.getElementById('registerErrorMessage');
-                errorElement.textContent = 'Пожалуйста, подтвердите, что вы не робот';
-                return;
+            if (form.id === 'loginForm') {
+                const recaptchaResponse = grecaptcha.getResponse();
+                if (!recaptchaResponse) {
+                    document.getElementById('errorMessage').textContent = 'Пожалуйста, подтвердите, что вы не робот';
+                    return;
+                }
+                data['g-recaptcha-response'] = recaptchaResponse;
+            } else {
+                // Для регистрации очищаем ошибку капчи, если вдруг осталась
+                document.getElementById('registerErrorMessage').textContent = '';
             }
-            data['g-recaptcha-response'] = recaptchaResponse;
 
             // Для чекбокса remember_me
             if (form.id === 'loginForm') {
@@ -395,10 +403,18 @@
 
         document.getElementById('loginForm').addEventListener('submit', e => {
             e.preventDefault();
+            if (typeof grecaptcha === 'undefined') {
+                document.getElementById('errorMessage').textContent = 'Ошибка загрузки reCAPTCHA. Пожалуйста, обновите страницу.';
+                return;
+            }
             handleFormSubmit(e.target, 'login');
         });
         document.getElementById('registerForm').addEventListener('submit', e => {
             e.preventDefault();
+            if (typeof grecaptcha === 'undefined') {
+                document.getElementById('registerErrorMessage').textContent = 'Ошибка загрузки reCAPTCHA. Пожалуйста, обновите страницу.';
+                return;
+            }
             handleFormSubmit(e.target, 'register');
         });
     </script>

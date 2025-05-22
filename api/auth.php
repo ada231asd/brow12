@@ -52,10 +52,12 @@ try {
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        // Проверка reCAPTCHA
-        if (!isset($data['g-recaptcha-response']) || !verifyRecaptcha($data['g-recaptcha-response'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Пожалуйста, подтвердите, что вы не робот']);
-            exit;
+        // Проверка reCAPTCHA только для логина
+        if ($action === 'login') {
+            if (!isset($data['g-recaptcha-response']) || !verifyRecaptcha($data['g-recaptcha-response'])) {
+                echo json_encode(['status' => 'error', 'message' => 'Пожалуйста, подтвердите, что вы не робот']);
+                exit;
+            }
         }
 
         if (is_null($data)) {

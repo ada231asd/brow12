@@ -143,7 +143,7 @@
                 // Фото профиля
                 const profileIcon = document.getElementById('profile-icon');
                 if (userData.user.photo && userData.user.photo !== '') {
-                    profileIcon.src = userData.user.photo;
+                    profileIcon.src = '/brow12/full_image/foto/' + userData.user.photo;
                 } else {
                     profileIcon.src = '/../brow12/img/profil.svg';
                 }

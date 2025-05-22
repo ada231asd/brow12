@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 18 2025 г., 12:12
+-- Время создания: Май 21 2025 г., 18:19
 -- Версия сервера: 5.7.39-log
 -- Версия PHP: 8.1.9
 
@@ -225,7 +225,74 @@ INSERT INTO `Admin_Logs` (`log_id`, `admin_id`, `action`, `created_at`, `table_n
 (154, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-18 08:54:17', 'Stores', NULL, 'VIEW'),
 (155, 5, 'Просмотр товаров (страница 1)', '2025-05-18 08:54:17', 'Products', NULL, 'VIEW'),
 (156, 5, 'Просмотр товаров (страница 1)', '2025-05-18 08:54:58', 'Products', NULL, 'VIEW'),
-(157, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-18 08:54:58', 'Stores', NULL, 'VIEW');
+(157, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-18 08:54:58', 'Stores', NULL, 'VIEW'),
+(158, 5, 'Просмотр товаров (страница 1)', '2025-05-19 11:44:29', 'Products', NULL, 'VIEW'),
+(159, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 11:44:29', 'Stores', NULL, 'VIEW'),
+(160, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 11:49:34', 'Stores', NULL, 'VIEW'),
+(161, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 11:49:50', 'Stores', NULL, 'VIEW'),
+(162, 5, 'Просмотр товаров (страница 1)', '2025-05-19 11:49:50', 'Products', NULL, 'VIEW'),
+(163, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 19:07:14', 'Stores', NULL, 'VIEW'),
+(164, 5, 'Просмотр товаров (страница 1)', '2025-05-19 19:07:14', 'Products', NULL, 'VIEW'),
+(165, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 19:15:59', 'Stores', NULL, 'VIEW'),
+(166, 5, 'Просмотр товаров (страница 1)', '2025-05-19 19:15:59', 'Products', NULL, 'VIEW'),
+(167, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 19:59:20', 'Stores', NULL, 'VIEW'),
+(168, 5, 'Просмотр товаров (страница 1)', '2025-05-19 19:59:21', 'Products', NULL, 'VIEW'),
+(169, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-19 20:00:14', 'Stores', NULL, 'VIEW'),
+(170, 5, 'Просмотр товаров (страница 1)', '2025-05-19 20:00:14', 'Products', NULL, 'VIEW'),
+(171, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:35:18', 'Products', NULL, 'VIEW'),
+(172, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:35:18', 'Stores', NULL, 'VIEW'),
+(173, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:39:23', 'Stores', NULL, 'VIEW'),
+(174, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:39:23', 'Products', NULL, 'VIEW'),
+(175, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:44:35', 'Stores', NULL, 'VIEW'),
+(176, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:44:35', 'Products', NULL, 'VIEW'),
+(177, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:45:10', 'Stores', NULL, 'VIEW'),
+(178, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:45:10', 'Products', NULL, 'VIEW'),
+(179, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:49:01', 'Stores', NULL, 'VIEW'),
+(180, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:49:01', 'Products', NULL, 'VIEW'),
+(181, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:49:14', 'Stores', NULL, 'VIEW'),
+(182, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:49:14', 'Products', NULL, 'VIEW'),
+(183, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:51:02', 'Stores', NULL, 'VIEW'),
+(184, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:51:02', 'Products', NULL, 'VIEW'),
+(185, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:51:12', 'Stores', NULL, 'VIEW'),
+(186, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:51:12', 'Products', NULL, 'VIEW'),
+(187, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:58:57', 'Stores', NULL, 'VIEW'),
+(188, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:58:57', 'Products', NULL, 'VIEW'),
+(189, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 11:59:44', 'Stores', NULL, 'VIEW'),
+(190, 5, 'Просмотр товаров (страница 1)', '2025-05-20 11:59:44', 'Products', NULL, 'VIEW'),
+(191, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 12:06:09', 'Stores', NULL, 'VIEW'),
+(192, 5, 'Просмотр товаров (страница 1)', '2025-05-20 12:06:09', 'Products', NULL, 'VIEW'),
+(193, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 12:13:14', 'Stores', NULL, 'VIEW'),
+(194, 5, 'Просмотр товаров (страница 1)', '2025-05-20 12:13:14', 'Products', NULL, 'VIEW'),
+(195, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 12:18:42', 'Stores', NULL, 'VIEW'),
+(196, 5, 'Просмотр товаров (страница 1)', '2025-05-20 12:18:42', 'Products', NULL, 'VIEW'),
+(197, 5, 'Просмотр товаров (страница 1)', '2025-05-20 12:26:32', 'Products', NULL, 'VIEW'),
+(198, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 12:26:32', 'Stores', NULL, 'VIEW'),
+(199, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 12:26:52', 'Stores', NULL, 'VIEW'),
+(200, 5, 'Просмотр товаров (страница 1)', '2025-05-20 12:26:52', 'Products', NULL, 'VIEW'),
+(201, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:04:11', 'Stores', NULL, 'VIEW'),
+(202, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:04:11', 'Products', NULL, 'VIEW'),
+(203, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:04:18', 'Stores', NULL, 'VIEW'),
+(204, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:04:18', 'Products', NULL, 'VIEW'),
+(205, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:04:21', 'Stores', NULL, 'VIEW'),
+(206, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:04:21', 'Products', NULL, 'VIEW'),
+(207, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:04:37', 'Products', NULL, 'VIEW'),
+(208, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:04:38', 'Products', NULL, 'VIEW'),
+(209, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:06:08', 'Stores', NULL, 'VIEW'),
+(210, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:06:08', 'Products', NULL, 'VIEW'),
+(211, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:12:27', 'Products', NULL, 'VIEW'),
+(212, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:12:27', 'Stores', NULL, 'VIEW'),
+(213, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:14:53', 'Stores', NULL, 'VIEW'),
+(214, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:14:53', 'Products', NULL, 'VIEW'),
+(215, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-20 13:15:30', 'Stores', NULL, 'VIEW'),
+(216, 5, 'Просмотр товаров (страница 1)', '2025-05-20 13:15:30', 'Products', NULL, 'VIEW'),
+(217, 5, 'Просмотр товаров (страница 1)', '2025-05-21 05:38:46', 'Products', NULL, 'VIEW'),
+(218, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-21 05:38:46', 'Stores', NULL, 'VIEW'),
+(219, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-21 05:38:47', 'Stores', NULL, 'VIEW'),
+(220, 5, 'Просмотр товаров (страница 1)', '2025-05-21 05:38:47', 'Products', NULL, 'VIEW'),
+(221, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-21 05:39:06', 'Stores', NULL, 'VIEW'),
+(222, 5, 'Просмотр товаров (страница 1)', '2025-05-21 05:39:06', 'Products', NULL, 'VIEW'),
+(223, 5, 'Просмотр магазинов (страница 1, store_id: все)', '2025-05-21 06:08:26', 'Stores', NULL, 'VIEW'),
+(224, 5, 'Просмотр товаров (страница 1)', '2025-05-21 06:08:26', 'Products', NULL, 'VIEW');
 
 -- --------------------------------------------------------
 
@@ -264,8 +331,8 @@ CREATE TABLE `Cart_Items` (
 --
 
 INSERT INTO `Cart_Items` (`cart_item_id`, `cart_id`, `product_id`, `quantity`) VALUES
-(4, 3, 2, 1),
-(5, 2, 35, 1);
+(5, 2, 35, 1),
+(6, 3, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -412,7 +479,6 @@ INSERT INTO `Feedback` (`feedback_id`, `category`, `user_id`, `message`, `status
 (10, 'Другое', 15, 'В магазине на Ленина, 10 грубо вел себя сотрудник.', 'Решен', 'Приносим извинения за инцидент. Персонал будет проинструктирован.', '2025-04-13 15:05:14'),
 (11, 'Другое', 16, 'Товар пришел с поврежденной упаковкой, хотя заказывал как подарок.', 'В обработке', NULL, '2025-04-22 07:50:33'),
 (12, 'Другое', 17, 'Предлагаю добавить фильтр по энергопотреблению для видеокарт.', 'Зарегистрирован', NULL, '2025-04-23 11:35:19'),
-(13, 'Другое', 18, 'Хотелось бы видеть больше обзоров товаров от ваших экспертов.', 'Решен', 'Спасибо за предложение! Уже работаем над этим.', '2025-04-12 16:20:45'),
 (14, 'Другое', 19, 'Есть ли разница между Intel Core i7-13700K и i7-13700KF кроме встроенной графики?', 'Решен', 'Нет, все остальные характеристики идентичны.', '2025-04-24 08:15:28');
 
 -- --------------------------------------------------------
@@ -454,7 +520,31 @@ INSERT INTO `Logs` (`log_id`, `user_id`, `action_description`, `created_at`) VAL
 (19, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-18 07:10:26'),
 (20, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-18 08:05:31'),
 (21, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-18 08:11:40'),
-(22, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-18 09:05:37');
+(22, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-18 09:05:37'),
+(23, NULL, 'Неудачная попытка входа для bobi@me.ru с IP 127.0.0.1', '2025-05-19 11:42:18'),
+(24, NULL, 'Неудачная попытка входа для bobi@me.ru с IP 127.0.0.1', '2025-05-19 11:42:19'),
+(25, NULL, 'Неудачная попытка входа для bobi@me.ru с IP 127.0.0.1', '2025-05-19 11:42:20'),
+(26, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 11:43:56'),
+(27, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 12:21:41'),
+(28, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 17:19:21'),
+(29, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 17:19:26'),
+(30, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 17:20:53'),
+(31, NULL, 'Неудачная попытка входа для bobi3133@me.ru с IP 127.0.0.1', '2025-05-19 17:24:20'),
+(32, NULL, 'Неудачная попытка входа для bobi3133@me.ru с IP 127.0.0.1', '2025-05-19 17:24:23'),
+(33, NULL, 'Неудачная попытка входа для bobi3133@me.ru с IP 127.0.0.1', '2025-05-19 17:24:24'),
+(34, NULL, 'Неудачная попытка входа для bobi@me.ru с IP 127.0.0.1', '2025-05-19 17:24:45'),
+(35, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 17:25:07'),
+(36, NULL, 'Неудачная попытка входа для bobi3133@me.ru с IP 127.0.0.1', '2025-05-19 18:59:04'),
+(37, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 18:59:14'),
+(38, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 19:01:35'),
+(39, NULL, 'Неудачная попытка входа для bobi3133@me.ru с IP 127.0.0.1', '2025-05-19 19:01:41'),
+(40, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 19:07:11'),
+(41, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 19:15:57'),
+(42, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 19:46:29'),
+(43, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-19 19:59:28'),
+(44, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-20 11:59:42'),
+(45, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-21 06:08:23'),
+(46, 5, 'Успешный вход для bobi@me.ru с IP 127.0.0.1', '2025-05-21 06:19:01');
 
 -- --------------------------------------------------------
 
@@ -478,7 +568,7 @@ INSERT INTO `News` (`news_id`, `title`, `content`, `image_url`, `created_at`) VA
 (1, 'Новые поступления', 'У нас в наличии новые процессоры Intel и AMD.', 'full_image\\promotions\\defoult.jpg	', '2025-01-30 16:44:34'),
 (2, 'Скидки на видеокарты', 'Специальные предложения на видеокарты NVIDIA.', 'full_image\\promotions\\defoult.jpg	', '2025-01-30 16:44:34'),
 (3, 'Открытие нового магазина', 'Противоположная точка зрения подразумевает, что реплицированные с зарубежных источников, современные исследования набирают популярность среди определённых слоёв населения, а значит, должны быть функционально разнесены на независимые элементы. Каждый из нас понимает очевидную вещь: социально-экономическое развитие влечёт за собой процесс внедрения и модернизации модели развития. \r\nИмеется спорная точка зрения, гласящая примерно следующее: элементы политического процесса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть ассоциативно распределены по отраслям. Безусловно, глубокий уровень погружения предполагает независимые способы реализации своевременного выполнения сверхзадачи. \r\nЛишь многие известные личности будут превращены в посмешище, хотя само их существование приносит несомненную пользу обществу. Учитывая ключевые сценарии поведения, сложившаяся структура организации создаёт предпосылки для системы обучения кадров, соответствующей насущным потребностям. Не следует, однако, забывать, что консультация с широким активом создаёт необходимость включения в производственный план целого ряда внеочередных мероприятий с учётом комплекса экспериментов, поражающих по своей масштабности и грандиозности.', 'full_image\\promotions\\defoult.jpg	', '2025-03-09 19:38:46'),
-(4, 'Открытие нового магазина', 'Противоположная точка зрения подразумевает, что реплицированные с зарубежных источников, современные исследования набирают популярность среди определённых слоёв населения, а значит, должны быть функционально разнесены на независимые элементы. Каждый из нас понимает очевидную вещь: социально-экономическое развитие влечёт за собой процесс внедрения и модернизации модели развития. \r\nИмеется спорная точка зрения, гласящая примерно следующее: элементы политического процесса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть ассоциативно распределены по отраслям. Безусловно, глубокий уровень погружения предполагает независимые способы реализации своевременного выполнения сверхзадачи. \r\nЛишь многие известные личности будут превращены в посмешище, хотя само их существование приносит несомненную пользу обществу. Учитывая ключевые сценарии поведения, сложившаяся структура организации создаёт предпосылки для системы обучения кадров, соответствующей насущным потребностям. Не следует, однако, забывать, что консультация с широким активом создаёт необходимость включения в производственный план целого ряда внеочередных мероприятий с учётом комплекса экспериментов, поражающих по своей масштабности и грандиозности.', 'full_image/news/67f82f77ecc35-62muSDn5SECBUyfiVY_jrw0RWgsbg5-w1zt7Ibqy4GuEtyhOqGxDltbV1tWr_qHAF3lsIPpC-jNAknfCz5PoLWTi.jpg', '2025-03-18 05:52:25');
+(4, 'Открытие нового магазина', 'Противоположная точка зрения подразумевает, что реплицированные с зарубежных источников, современные исследования набирают популярность среди определённых слоёв населения, а значит, должны быть функционально разнесены на независимые элементы. Каждый из нас понимает очевидную вещь: социально-экономическое развитие влечёт за собой процесс внедрения и модернизации модели развития. \r\nИмеется спорная точка зрения, гласящая примерно следующее: элементы политического процесса представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть ассоциативно распределены по отраслям. Безусловно, глубокий уровень погружения предполагает независимые способы реализации своевременного выполнения сверхзадачи. \r\nЛишь многие известные личности будут превращены в посмешище, хотя само их существование приносит несомненную пользу обществу. Учитывая ключевые сценарии поведения, сложившаяся структура организации создаёт предпосылки для системы обучения кадров, соответствующей насущным потребностям. Не следует, однако, забывать, что консультация с широким активом создаёт необходимость включения в производственный план целого ряда внеочередных мероприятий с учётом комплекса экспериментов, поражающих по своей масштабности и грандиозности.', 'full_image\\promotions\\defoult.jpg	', '2025-03-18 05:52:25');
 
 -- --------------------------------------------------------
 
@@ -502,7 +592,8 @@ CREATE TABLE `Orders` (
 
 INSERT INTO `Orders` (`order_id`, `order_code`, `user_id`, `order_status`, `delivery_address`, `total_price`, `created_at`) VALUES
 (1, 'ORDER-0001', 3, 'В обработке', 'Москва, ул. Ленина, д. 10', '95000.00', '2025-01-30 13:44:34'),
-(2, 'ORDER-0002', 5, 'Доставлен', 'Москва, ул. Ленина, д. 10', '35000.00', '2025-01-30 13:44:34');
+(2, 'ORDER-0002', 5, 'Доставлен', 'Москва, ул. Ленина, д. 10', '35000.00', '2025-01-30 13:44:34'),
+(3, 'ORDER-00003', 5, 'Новый', 'г. Москва, ул. Вавилова, д. 3, ТЦ ', '29750.00', '2025-05-21 14:42:52');
 
 -- --------------------------------------------------------
 
@@ -526,6 +617,84 @@ INSERT INTO `Order_Items` (`order_item_id`, `order_id`, `product_id`, `quantity`
 (1, 1, 1, 1, '35000.00'),
 (2, 1, 3, 1, '60000.00'),
 (3, 2, 1, 1, '35000.00');
+
+--
+-- Триггеры `Order_Items`
+--
+DELIMITER $$
+CREATE TRIGGER `set_bestseller_status` AFTER INSERT ON `Order_Items` FOR EACH ROW BEGIN
+    -- Declare variables
+    DECLARE threshold INT DEFAULT 10; -- Adjust this threshold based on your business logic (e.g., top 10% of sales)
+    DECLARE total_orders INT;
+    DECLARE cutoff INT;
+
+    -- Get total number of order items
+    SELECT COUNT(*) INTO total_orders FROM `Order_Items`;
+
+    -- Calculate cutoff for top-selling products (e.g., top 10%)
+    SET cutoff = CEIL(total_orders * 0.1);
+
+    -- Update is_bestseller status
+    UPDATE `Products` p
+    SET `is_bestseller` = (
+        SELECT CASE
+            WHEN (
+                SELECT COUNT(*) 
+                FROM `Order_Items` oi 
+                WHERE oi.`product_id` = p.`product_id`
+            ) >= (
+                SELECT MIN(order_count)
+                FROM (
+                    SELECT COUNT(*) as order_count
+                    FROM `Order_Items`
+                    GROUP BY `product_id`
+                    ORDER BY order_count DESC
+                    LIMIT cutoff
+                ) top_products
+            ) THEN 1
+            ELSE 0
+        END
+    );
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_bestseller_status_after_delete` AFTER DELETE ON `Order_Items` FOR EACH ROW BEGIN
+    -- Declare variables
+    DECLARE threshold INT DEFAULT 10; -- Adjust this threshold based on your business logic
+    DECLARE total_orders INT;
+    DECLARE cutoff INT;
+
+    -- Get total number of order items
+    SELECT COUNT(*) INTO total_orders FROM `Order_Items`;
+
+    -- Calculate cutoff for top-selling products (e.g., top 10%)
+    SET cutoff = CEIL(total_orders * 0.1);
+
+    -- Update is_bestseller status
+    UPDATE `Products` p
+    SET `is_bestseller` = (
+        SELECT CASE
+            WHEN (
+                SELECT COUNT(*) 
+                FROM `Order_Items` oi 
+                WHERE oi.`product_id` = p.`product_id`
+            ) >= (
+                SELECT MIN(order_count)
+                FROM (
+                    SELECT COUNT(*) as order_count
+                    FROM `Order_Items`
+                    GROUP BY `product_id`
+                    ORDER BY order_count DESC
+                    LIMIT cutoff
+                ) top_products
+            ) THEN 1
+            ELSE 0
+        END
+    );
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -555,7 +724,7 @@ INSERT INTO `Products` (`product_id`, `category_id`, `name`, `description`, `pri
 (1, 3, 'Intel Core i7', 'Процессор Intel Core i7 для ПК', '35000.00', 10, 'full_image\\promotions\\defoult.jpg	', 0, 1, '15.00', '2023-12-31 21:00:00'),
 (2, 3, 'AMD Ryzen 5', 'Процессор AMD Ryzen 5 для высоких нагрузок', '25000.00', 15, 'full_image\\promotions\\defoult.jpg	', 0, 1, '15.00', '2024-01-31 21:00:00'),
 (3, 4, 'NVIDIA GeForce RTX 3060', 'Видеокарта для гейминга и графики', '60000.00', 5, 'full_image\\promotions\\defoult.jpg	', 0, 1, '0.00', '2024-02-29 21:00:00'),
-(4, 3, 'Intel Core i7', 'Процессор Intel Core i7 для ПК', '1.00', 10, 'full_image/produkts/67f81cb160957-62muSDn5SECBUyfiVY_jrw0RWgsbg5-w1zt7Ibqy4GuEtyhOqGxDltbV1tWr_qHAF3lsIPpC-jNAknfCz5PoLWTi.jpg', 1, 0, '15.00', '2025-02-16 21:02:37'),
+(4, 3, 'Intel Core i7', 'Процессор Intel Core i7 для ПК', '1.00', 10, 'full_image\\promotions\\defoult.jpg	', 1, 0, '15.00', '2025-02-16 21:02:37'),
 (6, 4, 'NVIDIA GeForce RTX 3060', 'Видеокарта для гейминга и графики', '60000.00', 5, 'full_image\\promotions\\defoult.jpg	', 0, 1, '0.00', '2025-02-16 21:02:37'),
 (7, 3, 'Intel Core i7', 'Процессор Intel Core i7 для ПК', '35000.00', 10, 'full_image\\promotions\\defoult.jpg	', 1, 0, '15.00', '2025-02-16 21:02:37'),
 (8, 3, 'AMD Ryzen 5', 'Процессор AMD Ryzen 5 для высоких нагрузок', '25000.00', 15, 'full_image\\promotions\\defoult.jpg	', 1, 0, '15.00', '2025-02-16 21:02:37'),
@@ -604,6 +773,32 @@ INSERT INTO `Products` (`product_id`, `category_id`, `name`, `description`, `pri
 (52, 6, 'Коврик SteelSeries QcK Heavy', '900x400x6 мм, ткань', '3000.00', 25, 'full_image\\promotions\\defoult.jpg	', 1, 0, '5.00', '2025-02-16 21:02:37'),
 (53, 6, 'Коврик Logitech G840', '900x400x3 мм, ткань', '4000.00', 20, 'full_image\\promotions\\defoult.jpg	', 0, 0, '10.00', '2025-02-16 21:02:37'),
 (57, 1, 'шцуо', 'шшруц', '1211.00', 13, 'full_image/products/product_6814d75591c0b_photo_2025-05-01_15-26-03.jpg', 0, 0, '12.00', '2025-05-02 14:31:49');
+
+--
+-- Триггеры `Products`
+--
+DELIMITER $$
+CREATE TRIGGER `set_product_new_status` AFTER INSERT ON `Products` FOR EACH ROW BEGIN
+    UPDATE `Products`
+    SET `is_new` = CASE
+        WHEN DATEDIFF(NOW(), `created_at`) <= 7 THEN 1
+        ELSE 0
+    END
+    WHERE `product_id` = NEW.`product_id`;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_product_new_status` AFTER UPDATE ON `Products` FOR EACH ROW BEGIN
+    UPDATE `Products`
+    SET `is_new` = CASE
+        WHEN DATEDIFF(NOW(), `created_at`) <= 7 THEN 1
+        ELSE 0
+    END
+    WHERE `product_id` = NEW.`product_id`;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -675,7 +870,7 @@ CREATE TABLE `Promotions` (
 
 INSERT INTO `Promotions` (`promotion_id`, `title`, `description`, `image_url`, `start_date`, `end_date`, `category_id`, `status`) VALUES
 (1, 'Распродажа процессоров', 'Скидка 20% на все процессоры', 'full_image\\promotions\\defoult.jpg', '2024-03-01', '2024-03-31', 3, 'Активна'),
-(3, 'ууйу', 'щгтка', 'full_image/promotions/67f82f9364829-62muSDn5SECBUyfiVY_jrw0RWgsbg5-w1zt7Ibqy4GuEtyhOqGxDltbV1tWr_qHAF3lsIPpC-jNAknfCz5PoLWTi.jpg', '2025-06-04', '2025-11-13', 2, 'Активна');
+(3, 'ууйу', 'щгтка', 'full_image\\promotions\\defoult.jpg	', '2025-06-04', '2025-11-13', 2, 'Активна');
 
 -- --------------------------------------------------------
 
@@ -1023,7 +1218,7 @@ CREATE TABLE `Users` (
 
 INSERT INTO `Users` (`user_id`, `name`, `email`, `password_hash`, `role_id`, `created_at`, `photo`, `status`, `phone`, `postal_code`, `preferred_payment_method`, `preferred_delivery_method`, `lockout_until`) VALUES
 (3, 'Админ Админов', 'admin@example.com', 'hashpassword3', 3, '2025-01-30 16:44:34', '', 'Не в сети', '', '', '', '', NULL),
-(5, 'bobi', 'bobi@me.ru', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 1, '2025-03-15 19:19:30', NULL, 'Онлайн', '+79991234567', NULL, NULL, NULL, NULL),
+(5, 'bobi', 'bobi@me.ru', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 2, '2025-03-15 19:19:30', NULL, 'Онлайн', '+79991234567', NULL, NULL, NULL, NULL),
 (6, 'vadw2', 'vadw2@p.e', '$2y$10$aGXunBs5cBVdABGcz9oOdu9BPKrfyPfox5bMDnl.6.BiwAe0nHyMm', 1, '2025-03-25 06:08:45', NULL, 'Не в сети', '+71223123123', '', '', '', NULL),
 (7, 'Иван Петров', 'ivan.petrov@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 1, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79161234567', '123456', 'Карта', 'Курьер', NULL),
 (8, 'Елена Смирнова', 'elena.smirnova@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 1, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79162345678', '234567', 'Наличные', 'Самовывоз', NULL),
@@ -1036,10 +1231,36 @@ INSERT INTO `Users` (`user_id`, `name`, `email`, `password_hash`, `role_id`, `cr
 (15, 'Татьяна Редакторова', 'tanya.editor@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 5, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79169012345', '901234', NULL, NULL, NULL),
 (16, 'Виктор Контентов', 'viktor.content@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 6, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79160123456', '012345', NULL, NULL, NULL),
 (17, 'Наталья Новостная', 'natalya.news@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 6, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79161234567', '123456', NULL, NULL, NULL),
-(18, 'Артем Доставкин', 'artem.delivery@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 7, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79162345678', '234567', NULL, NULL, NULL),
 (19, 'Юлия Складова', 'yulia.warehouse@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 7, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79163456789', '345678', NULL, NULL, NULL),
 (20, 'Геннадий Главный', 'gennady.main@example.com', '$2y$10$9xkeGpOyW/CM7t1ELD6j1ODkJlbepmnWEC0hHB/3mBum/4VXwfHsq', 3, '2025-05-01 11:55:08', NULL, 'Не в сети', '+79164567890', '456789', NULL, NULL, NULL),
-(21, 'vad12', 'bobi32@me.ru', '$2y$10$TEJ4.2bOplnI5vBBhlGBju5Gd3yokeM8XnTYOgAIlCWDlhI.0Ek.y', 2, '2025-05-17 14:16:46', NULL, 'Не в сети', '', NULL, NULL, NULL, NULL);
+(21, 'vad12', 'bobi32@me.ru', '$2y$10$TEJ4.2bOplnI5vBBhlGBju5Gd3yokeM8XnTYOgAIlCWDlhI.0Ek.y', 2, '2025-05-17 14:16:46', NULL, 'Не в сети', '', NULL, NULL, NULL, NULL),
+(22, 'bobi3133@me.ru', 'kjjwwkj@klew.ru', '$2y$10$2GxwmZSZ8OuxUiJ/m1WhFe/Rl5bCpwHHO359pEDh2LPTwCQHRtjCG', 2, '2025-05-19 17:21:33', NULL, 'Не в сети', '+78858888888', NULL, NULL, NULL, NULL),
+(23, '123', 'bobi213@me.ru', '$2y$10$1p5EIPQDt4FYUVqg7Aj9TOvOteMS8hdpeTwBQ780AGLLNCRth0Cny', 2, '2025-05-19 19:16:39', NULL, 'Не в сети', '', NULL, NULL, NULL, NULL),
+(24, '87', 'bob1231i@me.ru', '$2y$10$9jcae2CCH6XUCdrQiyYED.c/tHZLa4FdjCCo4yyURz6ef8.KUEVDm', 2, '2025-05-19 19:27:07', NULL, 'Не в сети', '+78533364757', NULL, NULL, NULL, NULL);
+
+--
+-- Триггеры `Users`
+--
+DELIMITER $$
+CREATE TRIGGER `remove_account_lockout` AFTER UPDATE ON `Users` FOR EACH ROW BEGIN
+    IF OLD.`lockout_until` IS NOT NULL AND OLD.`lockout_until` <= NOW() THEN
+        UPDATE `Users`
+        SET `lockout_until` = NULL
+        WHERE `user_id` = NEW.`user_id`;
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `remove_account_lockout_after_insert` AFTER INSERT ON `Users` FOR EACH ROW BEGIN
+    IF NEW.`lockout_until` IS NOT NULL AND NEW.`lockout_until` <= NOW() THEN
+        UPDATE `Users`
+        SET `lockout_until` = NULL
+        WHERE `user_id` = NEW.`user_id`;
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -1060,7 +1281,7 @@ CREATE TABLE `User_Sessions` (
 --
 
 INSERT INTO `User_Sessions` (`session_id`, `user_id`, `token`, `created_at`, `expires_at`) VALUES
-(66, 5, '9e2f0732e5f2a3ac83f84e6c5d33f0c78b9aff0b142a6aa890abef7570d44a18', '2025-05-18 09:05:37', '2025-05-19 09:05:37');
+(13, 5, '9ff433d55a2cbddee3b1e0311459c2fc2b9f4f5a359731632663f940b22e0a86', '2025-05-21 06:19:01', '2025-05-22 06:19:01');
 
 --
 -- Триггеры `User_Sessions`
@@ -1080,6 +1301,22 @@ DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `after_user_session_update` AFTER UPDATE ON `User_Sessions` FOR EACH ROW BEGIN
     CALL UpdateUserStatus(NEW.user_id);
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `clean_old_sessions` AFTER INSERT ON `User_Sessions` FOR EACH ROW BEGIN
+    DELETE FROM `User_Sessions`
+    WHERE `expires_at` < NOW() 
+    AND DATEDIFF(NOW(), `created_at`) > 7;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_clean_old_sessions` AFTER UPDATE ON `User_Sessions` FOR EACH ROW BEGIN
+    DELETE FROM `User_Sessions`
+    WHERE `expires_at` < NOW() 
+    AND DATEDIFF(NOW(), `created_at`) > 7;
 END
 $$
 DELIMITER ;
@@ -1269,7 +1506,7 @@ ALTER TABLE `User_Sessions`
 -- AUTO_INCREMENT для таблицы `Admin_Logs`
 --
 ALTER TABLE `Admin_Logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- AUTO_INCREMENT для таблицы `Cart`
@@ -1281,7 +1518,7 @@ ALTER TABLE `Cart`
 -- AUTO_INCREMENT для таблицы `Cart_Items`
 --
 ALTER TABLE `Cart_Items`
-  MODIFY `cart_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `cart_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `Categories`
@@ -1323,7 +1560,7 @@ ALTER TABLE `Feedback`
 -- AUTO_INCREMENT для таблицы `Logs`
 --
 ALTER TABLE `Logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT для таблицы `News`
@@ -1335,13 +1572,13 @@ ALTER TABLE `News`
 -- AUTO_INCREMENT для таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `Order_Items`
 --
 ALTER TABLE `Order_Items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `Products`
@@ -1389,13 +1626,13 @@ ALTER TABLE `Stores`
 -- AUTO_INCREMENT для таблицы `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT для таблицы `User_Sessions`
 --
 ALTER TABLE `User_Sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

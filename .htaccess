@@ -1,0 +1,2 @@
+# Разрешаем фреймы от Google для reCAPTCHA
+Header set Content-Security-Policy "frame-ancestors 'self' https://www.google.com" 
